@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Redis from 'ioredis'
-import { EarningsResp } from '../../../interfaces'
+import { EarningsMetric, EarningsResp } from '../../../interfaces'
 
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   const redis = new Redis(process.env.REDIS_URL)
@@ -12,13 +12,21 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     if (!Array.isArray(dataJson)) {
       throw new Error('Cannot find data')
     }
+    const earnings = dataJson as EarningsMetric[]
+    const numPages = Math.floor(earnings.length / 10)
 
-    const numPages = Math.floor(dataJson.length / 10)
-
+    const count = 10
     const p = page ? Number(page as string) : 0
+    const cursor = p * count
     const endAmount =
-      dataJson.length - p * 10 < 10 ? dataJson.length - p * 10 : 10
-    const dataFromPage = dataJson.slice(p * 10, endAmount)
+      earnings.length - cursor < count ? earnings.length - cursor : count
+    const dataFromPage = earnings.slice(cursor, cursor + endAmount)
+    console.log({
+      endAmount,
+      cusser: p * 10,
+      l: earnings.length,
+      dl: dataFromPage.length,
+    })
 
     res.status(200).json({
       earnings: dataFromPage,

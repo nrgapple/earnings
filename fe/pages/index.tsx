@@ -1,33 +1,19 @@
-import Layout from '../components/Layout'
 import useSWR from 'swr'
-import {
-  EarningsMetric,
-  EarningsResp,
-  ReportPretty,
-  ScoresData,
-} from '../interfaces'
-import {
-  Card,
-  Container,
-  Grid,
-  Loading,
-  Table,
-  Text,
-  useAsyncList,
-  useCollator,
-} from '@nextui-org/react'
-import { currencyFormatter, objArrToObj, toPercentFormat } from '../utils'
+import { EarningsResp } from '../interfaces'
+import { Card, Container, Grid, Loading, Text } from '@nextui-org/react'
 import { TagGraph } from '../components/TagGraph'
 
 const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
   const resp = await fetch(input, init)
   const data = await resp.json()
-  console.log(data)
   return data
 }
 
 const IndexPage = () => {
-  const { data, error } = useSWR<EarningsResp, Error>('/api/scores', fetcher)
+  const { data, error } = useSWR<EarningsResp, Error>(
+    '/api/scores?page=34',
+    fetcher
+  )
 
   const loading = !data && !error
 
