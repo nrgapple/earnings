@@ -1,21 +1,8 @@
 import useSWR from 'swr'
 import { EarningsResp } from '../interfaces'
-import {
-  Button,
-  Card,
-  Container,
-  Grid,
-  Link,
-  Loading,
-  Pagination,
-  Spacer,
-  StyledButtonGroup,
-  Text,
-} from '@nextui-org/react'
-import { TagGraph } from '../components/TagGraph'
+import { Card, Container, Grid, Text } from '@nextui-org/react'
 import { useState } from 'react'
 import { Nav } from '../components/Nav'
-import NextLink from 'next/link'
 
 // @ts-ignore
 const fetcher = async (...args) => {
