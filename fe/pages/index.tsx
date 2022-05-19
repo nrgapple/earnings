@@ -1,15 +1,21 @@
 import useSWR from 'swr'
 import { EarningsResp } from '../interfaces'
 import {
+  Button,
   Card,
   Container,
   Grid,
+  Link,
   Loading,
   Pagination,
+  Spacer,
+  StyledButtonGroup,
   Text,
 } from '@nextui-org/react'
 import { TagGraph } from '../components/TagGraph'
 import { useState } from 'react'
+import { Nav } from '../components/Nav'
+import NextLink from 'next/link'
 
 // @ts-ignore
 const fetcher = async (...args) => {
@@ -31,40 +37,20 @@ const IndexPage = () => {
 
   return (
     <Container fluid>
-      <Grid.Container gap={2} justify="center">
-        <Grid xs={12} justify="center">
-          <Text h1>Company Growths</Text>
-        </Grid>
-        {loading ? (
-          <Loading />
-        ) : error ? (
-          <Text h4>There was an error: {error.message}</Text>
-        ) : (
-          <Grid.Container justify="center" gap={2}>
-            <Grid>
-              <Pagination
-                total={data.pages}
-                page={pageNumber}
-                onChange={(p) => {
-                  console.log('here')
-                  setPageNumber(p)
-                }}
-              />
-            </Grid>
-            {data.earnings.map((x) => (
-              <Grid key={x.ticker} xs={12}>
-                <Card style={{ width: 'full' }}>
-                  <Grid.Container gap={2}>
-                    <Grid>
-                      <Text h3>{x.ticker}</Text>
-                    </Grid>
-                    <Grid xs={12}>{<TagGraph reports={x} />}</Grid>
-                  </Grid.Container>
-                </Card>
+      <Grid.Container gap={5} justify="center">
+        <Nav />
+        <Grid xs={12}>
+          <Card>
+            <Grid.Container justify="center">
+              <Grid xs={12} justify="center">
+                <Text h1>Lets Get Started</Text>
               </Grid>
-            ))}
-          </Grid.Container>
-        )}
+              <Grid xs={12} justify="center">
+                <Text h3>Find the info you need.</Text>
+              </Grid>
+            </Grid.Container>
+          </Card>
+        </Grid>
       </Grid.Container>
     </Container>
   )
