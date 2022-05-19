@@ -22,7 +22,7 @@ interface Props {
 
 const labelFormatter = (v: number) => {
   const value = v.toString()
-  return `${value.slice(0, 4)}Q${value.charAt(4)}`
+  return new Date(v * 1000).toLocaleDateString('en-US')
 }
 
 const priceFormatter = (v) => {
@@ -37,7 +37,7 @@ export const TagGraph = ({ reports }: Props) => {
       ([tag, reports]) => {
         return reports.map((x) => {
           return {
-            name: Number(`${x.fy}${x.fp.charAt(1)}`),
+            name: new Date(x.end).getTime() / 1000,
             [tag]: x.val,
           }
         })
@@ -58,8 +58,6 @@ export const TagGraph = ({ reports }: Props) => {
       }, [])
       .sort((a, b) => a.name - b.name)
   }, [reports])
-
-  console.log(data)
 
   return (
     <ResponsiveContainer width="100%" height={750} debounce={200}>
