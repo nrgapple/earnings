@@ -25,8 +25,6 @@ const Earnings = () => {
     `/api/scores?page=${pageNumber}`,
     fetcher
   )
-  console.log({ pageNumber })
-
   const loading = !data && !error
 
   return (
