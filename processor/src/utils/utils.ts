@@ -53,7 +53,7 @@ export const getChunks = (a: unknown[], size: number) =>
 
 export const sortReports = (reports: Report[], field1: keyof Report) => {
   return reports.sort(
-    (a, b) => new Date(a[field1]).getTime() - new Date(b[field1]).getTime()
+    (a, b) => new Date(a[field1]!).getTime() - new Date(b[field1]!).getTime()
   )
 }
 
@@ -144,7 +144,7 @@ export const objArrToObj = <T extends string, TV extends unknown>(
   arr.forEach((item) => {
     result[item.key] = item.value
   })
-  
+
   return result
 }
 
@@ -173,13 +173,8 @@ export const calculateGrowthPercentPerQuarter = (
         ? calcPercentGrowth(previous.previousReport, currentReport)
         : undefined
       previous.reportsData.push({
-        form: currentReport.form,
-        fp: currentReport.fp,
-        fy: currentReport.fy,
-        start: currentReport.start,
         end: currentReport.end,
         val: currentReport.val,
-        percentGrowthYoY: percentGrowth,
       })
       return {
         percent: percentGrowth

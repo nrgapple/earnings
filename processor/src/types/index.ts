@@ -38,7 +38,7 @@ export interface TagData {
 }
 
 export interface Report {
-  val: number
+  val?: number
   form: string
   fy: number
   fp: string
@@ -49,13 +49,13 @@ export interface Report {
 }
 
 export interface ReportPretty {
-  val: number
-  form: string
-  fy: number
-  fp: string
-  start: string
+  val?: number
+  form?: string
+  fy?: number
+  fp?: string
+  start?: string
   end: string
-  percentGrowthYoY: number | undefined
+  percentGrowthYoY?: number | undefined
 }
 
 export interface CompanyProfile {

@@ -1,4 +1,4 @@
-import { Earnings, OperationType, Report, TagData } from '../types'
+import { EarningsMetric, OperationType, Report, ReportPretty } from '../types'
 
 const calcOperation = (num: number, num2: number, operation: OperationType) => {
   switch (operation) {
@@ -17,68 +17,53 @@ const calcOperation = (num: number, num2: number, operation: OperationType) => {
 
 const calcNumberToTag = (
   num: number,
-  tag: TagData,
+  tag: ReportPretty[],
   operation: OperationType
 ) => {
-  const units = tag.units.USD.map((report) => {
+  return tag.map((report) => {
     return {
       ...report,
-      val: calcOperation(num, report.val, operation),
-    } as Report
+      val: report.val ? calcOperation(num, report.val, operation) : undefined,
+    } as ReportPretty
   })
-  return {
-    ...tag,
-    units: {
-      ...tag.units,
-      USD: units,
-    },
-  } as TagData
 }
 
 const getCalculateTag = (
-  tag1: TagData | undefined,
-  tag2: TagData | undefined,
+  tag1: ReportPretty[] | undefined,
+  tag2: ReportPretty[] | undefined,
   operation: OperationType
 ) => {
-  if (!tag1?.units?.USD || !tag2?.units?.USD) return undefined
-  const reports1 = tag1.units.USD
-  const report2 = tag2.units.USD
-  const newReports = reports1
+  if (!tag1 || !tag2) return undefined
+  const reports1 = tag1
+  const report2 = tag2
+  return reports1
     .map((r1) => {
       const otherReport = report2.find(
         (r2) => r2.end === r1.end && r1.form === r2.form
       )
       if (otherReport) {
-        let val = 0
+        let val = undefined
         return {
           ...r1,
           val,
-        } as Report
+        } as ReportPretty
       }
       return undefined
     })
-    .filter((x) => x) as Report[]
-
-  return {
-    ...tag1,
-    units: {
-      ...tag1.units,
-      USD: newReports,
-    },
-  } as TagData
+    .filter((x) => x) as ReportPretty[]
 }
 
-export const load = (earning: Earnings) => {
-  const tags = {} as Record<string, TagData | undefined>
+export const load = (earning: EarningsMetric) => {
+  const tags = {} as Record<string, ReportPretty[] | undefined>
 
   // Assets
-  tags['Assets'] = earning.tags['Assets'] || undefined
+  tags['Assets'] = [...(earning.metrics['Assets'] ?? [])]
 
   // Current Assets
-  tags['CurrentAssets'] = earning.tags['AssetsCurrent'] || undefined
+  tags['CurrentAssets'] = [...(earning.metrics['AssetsCurrent'] ?? [])]
 
   // Noncurrent Assets
-  tags['NoncurrentAssets'] = earning.tags['AssetsNoncurrent']
+  tags['NoncurrentAssets'] = [...(earning.metrics['AssetsNoncurrent'] ?? [])]
   if (tags['NoncurrentAssets'] === null) {
     if (tags['Assets'] && tags['CurrentAssets']) {
       tags['NoncurrentAssets'] = getCalculateTag(
@@ -93,22 +78,23 @@ export const load = (earning: Earnings) => {
 
   // LiabilitiesAndEquity
   tags['LiabilitiesAndEquity'] =
-    earning.tags['LiabilitiesAndStockholdersEquity']
+    earning.metrics['LiabilitiesAndStockholdersEquity']
   if (tags['LiabilitiesAndEquity'] === null) {
-    tags['LiabilitiesAndEquity'] = earning.tags['LiabilitiesAndPartnersCapital']
+    tags['LiabilitiesAndEquity'] =
+      earning.metrics['LiabilitiesAndPartnersCapital']
     if (tags['LiabilitiesAndEquity']) {
       tags['LiabilitiesAndEquity'] = undefined
     }
   }
 
   // Liabilities
-  tags['Liabilities'] = earning.tags['Liabilities'] || undefined
+  tags['Liabilities'] = [...(earning.metrics['Liabilities'] ?? [])]
 
   // CurrentLiabilities
-  tags['CurrentLiabilities'] = earning.tags['LiabilitiesCurrent']
+  tags['CurrentLiabilities'] = [...earning.metrics['LiabilitiesCurrent']]
 
   // Noncurrent Liabilities
-  tags['NoncurrentLiabilities'] = earning.tags['LiabilitiesNoncurrent']
+  tags['NoncurrentLiabilities'] = [...earning.metrics['LiabilitiesNoncurrent']]
   if (tags['NoncurrentLiabilities'] === null) {
     if (tags['Liabilities'] && tags['CurrentLiabilities']) {
       tags['NoncurrentLiabilities'] = getCalculateTag(
@@ -122,26 +108,33 @@ export const load = (earning: Earnings) => {
   }
 
   // CommitmentsAndContingencies
-  tags['CommitmentsAndContingencies'] =
-    earning.tags['CommitmentsAndContingencies'] || undefined
+  tags['CommitmentsAndContingencies'] = [
+    ...(earning.metrics['CommitmentsAndContingencies'] ?? []),
+  ]
 
   // TemporaryEquity
-  tags['TemporaryEquity'] =
-    earning.tags['TemporaryEquityRedemptionValue'] ||
-    earning.tags['RedeemablePreferredStockCarryingAmount'] ||
-    earning.tags['TemporaryEquityCarryingAmount'] ||
-    earning.tags['TemporaryEquityValueExcludingAdditionalPaidInCapital'] ||
-    earning.tags['TemporaryEquityCarryingAmountAttributableToParent'] ||
-    earning.tags['RedeemableNoncontrollingInterestEquityFairValue'] ||
-    undefined
+  tags['TemporaryEquity'] = [
+    ...(earning.metrics['TemporaryEquityRedemptionValue'] ?? []),
+    ...(earning.metrics['RedeemablePreferredStockCarryingAmount'] ?? []),
+    ...(earning.metrics['TemporaryEquityCarryingAmount'] ?? []),
+    ...(earning.metrics[
+      'TemporaryEquityValueExcludingAdditionalPaidInCapital'
+    ] ?? []),
+    ...(earning.metrics['TemporaryEquityCarryingAmountAttributableToParent'] ??
+      []),
+    ...(earning.metrics['RedeemableNoncontrollingInterestEquityFairValue'] ??
+      []),
+  ]
 
   // RedeemableNoncontrollingInterest (added to temporary equity)
-  var redeemableNoncontrollingInterest =
-    earning.tags['RedeemableNoncontrollingInterestEquityCarryingAmount'] ||
-    earning.tags[
+  var redeemableNoncontrollingInterest = [
+    ...(earning.metrics[
+      'RedeemableNoncontrollingInterestEquityCarryingAmount'
+    ] ?? []),
+    ...(earning.metrics[
       'RedeemableNoncontrollingInterestEquityCommonCarryingAmount'
-    ] ||
-    undefined
+    ] ?? []),
+  ]
 
   // This adds redeemable noncontrolling interest and temporary equity which are rare, but can be reported seperately
   if (tags['TemporaryEquity']) {
@@ -153,31 +146,33 @@ export const load = (earning: Earnings) => {
   }
 
   // Equity
-  tags['Equity'] =
-    earning.tags[
+  tags['Equity'] = [
+    ...(earning.metrics[
       'StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest'
-    ] ||
-    earning.tags['StockholdersEquity'] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics['StockholdersEquity'] ?? []),
+    ...(earning.metrics[
       'PartnersCapitalIncludingPortionAttributableToNoncontrollingInterest'
-    ] ||
-    earning.tags['PartnersCapital'] ||
-    earning.tags['CommonStockholdersEquity'] ||
-    earning.tags['MemberEquity'] ||
-    earning.tags['AssetsNet'] ||
-    undefined
+    ] ?? []),
+    ...(earning.metrics['PartnersCapital'] ?? []),
+    ...(earning.metrics['CommonStockholdersEquity'] ?? []),
+    ...(earning.metrics['MemberEquity'] ?? []),
+    ...(earning.metrics['AssetsNet'] ?? []),
+  ]
 
   // EquityAttributableToNoncontrollingInterest
-  tags['EquityAttributableToNoncontrollingInterest'] =
-    earning.tags['MinorityInterest'] ||
-    earning.tags['PartnersCapitalAttributableToNoncontrollingInterest'] ||
-    undefined
+  tags['EquityAttributableToNoncontrollingInterest'] = [
+    ...(earning.metrics['MinorityInterest'] ?? []),
+    ...(earning.metrics[
+      'PartnersCapitalAttributableToNoncontrollingInterest'
+    ] ?? []),
+  ]
 
   // EquityAttributableToParent
-  tags['EquityAttributableToParent'] =
-    earning.tags['StockholdersEquity'] ||
-    earning.tags['LiabilitiesAndPartnersCapital'] ||
-    undefined
+  tags['EquityAttributableToParent'] = [
+    ...(earning.metrics['StockholdersEquity'] ?? []),
+    ...(earning.metrics['LiabilitiesAndPartnersCapital'] ?? []),
+  ]
 
   // BS Adjustments
   // If total assets is missing, try using current assets
@@ -313,186 +308,186 @@ export const load = (earning: Earnings) => {
   }
 
   // Revenues
-  tags['Revenues'] =
-    earning.tags['Revenues'] ||
-    earning.tags['SalesRevenueNet'] ||
-    earning.tags['SalesRevenueServicesNet'] ||
-    earning.tags['RevenuesNetOfInterestExpense'] ||
-    earning.tags['RegulatedAndUnregulatedOperatingRevenue'] ||
-    earning.tags['HealthCareOrganizationRevenue'] ||
-    earning.tags['InterestAndDividendIncomeOperating'] ||
-    earning.tags['RealEstateRevenueNet'] ||
-    earning.tags['RevenueMineralSales'] ||
-    earning.tags['OilAndGasRevenue'] ||
-    earning.tags['FinancialServicesRevenue'] ||
-    earning.tags['RegulatedAndUnregulatedOperatingRevenue'] ||
-    earning.tags['RevenueFromContractWithCustomerExcludingAssessedTax'] ||
-    0
+  tags['Revenues'] = [
+    ...(earning.metrics['Revenues'] ?? []),
+    ...(earning.metrics['SalesRevenueNet'] ?? []),
+    ...(earning.metrics['SalesRevenueServicesNet'] ?? []),
+    ...(earning.metrics['RevenuesNetOfInterestExpense'] ?? []),
+    ...(earning.metrics['RegulatedAndUnregulatedOperatingRevenue'] ?? []),
+    ...(earning.metrics['HealthCareOrganizationRevenue'] ?? []),
+    ...(earning.metrics['InterestAndDividendIncomeOperating'] ?? []),
+    ...(earning.metrics['RealEstateRevenueNet'] ?? []),
+    ...(earning.metrics['RevenueMineralSales'] ?? []),
+    ...(earning.metrics['OilAndGasRevenue'] ?? []),
+    ...(earning.metrics['FinancialServicesRevenue'] ?? []),
+    ...(earning.metrics['RegulatedAndUnregulatedOperatingRevenue'] ?? []),
+    ...(earning.metrics[
+      'RevenueFromContractWithCustomerExcludingAssessedTax'
+    ] ?? []),
+  ]
 
   // CostOfRevenue
-  tags['CostOfRevenue'] =
-    earning.tags['CostOfRevenue'] ||
-    earning.tags['CostOfServices'] ||
-    earning.tags['CostOfGoodsSold'] ||
-    earning.tags['CostOfGoodsAndServicesSold'] ||
-    0
+  tags['CostOfRevenue'] = [
+    ...(earning.metrics['CostOfRevenue'] ?? []),
+    ...(earning.metrics['CostOfServices'] ?? []),
+    ...(earning.metrics['CostOfGoodsSold'] ?? []),
+    ...(earning.metrics['CostOfGoodsAndServicesSold'] ?? []),
+  ]
 
   // GrossProfit
-  tags['GrossProfit'] =
-    earning.tags['GrossProfit'] || earning.tags['GrossProfit'] || undefined
+  tags['GrossProfit'] = [
+    ...(earning.metrics['GrossProfit'] ?? []),
+    ...(earning.metrics['GrossProfit'] ?? []),
+  ]
 
   // OperatingExpenses
-  tags['OperatingExpenses'] =
-    earning.tags['OperatingExpenses'] ||
-    earning.tags['OperatingCostsAndExpenses'] ||
-    0
+  tags['OperatingExpenses'] = [
+    ...(earning.metrics['OperatingExpenses'] ?? []),
+    ...(earning.metrics['OperatingCostsAndExpenses'] ?? []),
+  ]
 
   // CostsAndExpenses
-  tags['CostsAndExpenses'] =
-    earning.tags['CostsAndExpenses'] ||
-    earning.tags['CostsAndExpenses'] ||
-    undefined
+  tags['CostsAndExpenses'] = [
+    ...(earning.metrics['CostsAndExpenses'] ?? []),
+    ...(earning.metrics['CostsAndExpenses'] ?? []),
+  ]
 
   // OtherOperatingIncome
-  tags['OtherOperatingIncome'] =
-    earning.tags['OtherOperatingIncome'] ||
-    earning.tags['OtherOperatingIncome'] ||
-    undefined
+  tags['OtherOperatingIncome'] = [
+    ...(earning.metrics['OtherOperatingIncome'] ?? []),
+    ...(earning.metrics['OtherOperatingIncome'] ?? []),
+  ]
 
   // OperatingIncomeLoss
-  tags['OperatingIncomeLoss'] =
-    earning.tags['OperatingIncomeLoss'] ||
-    earning.tags['OperatingIncomeLoss'] ||
-    undefined
+  tags['OperatingIncomeLoss'] = [
+    ...(earning.metrics['OperatingIncomeLoss'] ?? []),
+    ...(earning.metrics['OperatingIncomeLoss'] ?? []),
+  ]
 
   // NonoperatingIncomeLoss
-  tags['NonoperatingIncomeLoss'] =
-    earning.tags['NonoperatingIncomeExpense'] ||
-    earning.tags['NonoperatingIncomeExpense'] ||
-    undefined
-
+  tags['NonoperatingIncomeLoss'] = [
+    ...(earning.metrics['NonoperatingIncomeExpense'] ?? []),
+    ...(earning.metrics['NonoperatingIncomeExpense'] ?? []),
+  ]
   // InterestAndDebtExpense
-  tags['InterestAndDebtExpense'] =
-    earning.tags['InterestAndDebtExpense'] ||
-    earning.tags['InterestAndDebtExpense'] ||
-    undefined
-
+  tags['InterestAndDebtExpense'] = [
+    ...(earning.metrics['InterestAndDebtExpense'] ?? []),
+    ...(earning.metrics['InterestAndDebtExpense'] ?? []),
+  ]
   // IncomeBeforeEquityMethodInvestments
-  tags['IncomeBeforeEquityMethodInvestments'] =
-    earning.tags[
+  tags['IncomeBeforeEquityMethodInvestments'] = [
+    ...(earning.metrics[
       'IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'
-    ] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics[
       'IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'
-    ] ||
-    undefined
-
+    ] ?? []),
+  ]
   // IncomeFromEquityMethodInvestments
-  tags['IncomeFromEquityMethodInvestments'] =
-    earning.tags['IncomeLossFromEquityMethodInvestments'] ||
-    earning.tags['IncomeLossFromEquityMethodInvestments'] ||
-    undefined
-
+  tags['IncomeFromEquityMethodInvestments'] = [
+    ...(earning.metrics['IncomeLossFromEquityMethodInvestments'] ?? []),
+    ...(earning.metrics['IncomeLossFromEquityMethodInvestments'] ?? []),
+  ]
   // IncomeFromContinuingOperationsBeforeTax
-  tags['IncomeFromContinuingOperationsBeforeTax'] =
-    earning.tags[
+  tags['IncomeFromContinuingOperationsBeforeTax'] = [
+    ...(earning.metrics[
       'IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'
-    ] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics[
       'IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest'
-    ] ||
-    undefined
+    ] ?? []),
+  ]
 
   // IncomeTaxExpenseBenefit
-  tags['IncomeTaxExpenseBenefit'] =
-    earning.tags['IncomeTaxExpenseBenefit'] ||
-    earning.tags['IncomeTaxExpenseBenefitContinuingOperations'] ||
-    undefined
-
+  tags['IncomeTaxExpenseBenefit'] = [
+    ...(earning.metrics['IncomeTaxExpenseBenefit'] ?? []),
+    ...(earning.metrics['IncomeTaxExpenseBenefitContinuingOperations'] ?? []),
+  ]
   // IncomeFromContinuingOperationsAfterTax
-  tags['IncomeFromContinuingOperationsAfterTax'] =
-    earning.tags[
+  tags['IncomeFromContinuingOperationsAfterTax'] = [
+    ...(earning.metrics[
       'IncomeLossBeforeExtraordinaryItemsAndCumulativeEffectOfChangeInAccountingPrinciple'
-    ] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics[
       'IncomeLossBeforeExtraordinaryItemsAndCumulativeEffectOfChangeInAccountingPrinciple'
-    ] ||
-    undefined
-
+    ] ?? []),
+  ]
   // IncomeFromDiscontinuedOperations
-  tags['IncomeFromDiscontinuedOperations'] =
-    earning.tags['IncomeLossFromDiscontinuedOperationsNetOfTax'] ||
-    earning.tags[
+  tags['IncomeFromDiscontinuedOperations'] = [
+    ...(earning.metrics['IncomeLossFromDiscontinuedOperationsNetOfTax'] ?? []),
+    ...(earning.metrics[
       'DiscontinuedOperationGainLossOnDisposalOfDiscontinuedOperationNetOfTax'
-    ] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics[
       'IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToReportingEntity'
-    ] ||
-    undefined
-
+    ] ?? []),
+  ]
   // ExtraordaryItemsGainLoss
-  tags['ExtraordaryItemsGainLoss'] =
-    earning.tags['ExtraordinaryItemNetOfTax'] ||
-    earning.tags['ExtraordinaryItemNetOfTax'] ||
-    undefined
-
+  tags['ExtraordaryItemsGainLoss'] = [
+    ...(earning.metrics['ExtraordinaryItemNetOfTax'] ?? []),
+    ...(earning.metrics['ExtraordinaryItemNetOfTax'] ?? []),
+  ]
   // NetIncomeLoss
-  tags['NetIncomeLoss'] =
-    earning.tags['ProfitLoss'] ||
-    earning.tags['NetIncomeLoss'] ||
-    earning.tags['NetIncomeLossAvailableToCommonStockholdersBasic'] ||
-    earning.tags['IncomeLossFromContinuingOperations'] ||
-    earning.tags['IncomeLossAttributableToParent'] ||
-    earning.tags[
+  tags['NetIncomeLoss'] = [
+    ...(earning.metrics['ProfitLoss'] ?? []),
+    ...(earning.metrics['NetIncomeLoss'] ?? []),
+    ...(earning.metrics['NetIncomeLossAvailableToCommonStockholdersBasic'] ??
+      []),
+    ...(earning.metrics['IncomeLossFromContinuingOperations'] ?? []),
+    ...(earning.metrics['IncomeLossAttributableToParent'] ?? []),
+    ...(earning.metrics[
       'IncomeLossFromContinuingOperationsIncludingPortionAttributableToNoncontrollingInterest'
-    ] ||
-    undefined
-
+    ] ?? []),
+  ]
   // NetIncomeAvailableToCommonStockholdersBasic
-  tags['NetIncomeAvailableToCommonStockholdersBasic'] =
-    earning.tags['NetIncomeLossAvailableToCommonStockholdersBasic'] || undefined
-
+  tags['NetIncomeAvailableToCommonStockholdersBasic'] = [
+    ...(earning.metrics['NetIncomeLossAvailableToCommonStockholdersBasic'] ??
+      []),
+  ]
   // #PreferredStockDividendsAndOtherAdjustments
-  tags['PreferredStockDividendsAndOtherAdjustments'] =
-    earning.tags['PreferredStockDividendsAndOtherAdjustments'] || undefined
-
+  tags['PreferredStockDividendsAndOtherAdjustments'] = [
+    ...(earning.metrics['PreferredStockDividendsAndOtherAdjustments'] ?? []),
+  ]
   // #NetIncomeAttributableToNoncontrollingInterest
-  tags['NetIncomeAttributableToNoncontrollingInterest'] =
-    earning.tags['NetIncomeLossAttributableToNoncontrollingInterest'] ||
-    undefined
+  tags['NetIncomeAttributableToNoncontrollingInterest'] = [
+    ...(earning.metrics['NetIncomeLossAttributableToNoncontrollingInterest'] ??
+      []),
+  ]
 
   // #NetIncomeAttributableToParent
-  tags['NetIncomeAttributableToParent'] =
-    earning.tags['NetIncomeLoss'] || undefined
+  tags['NetIncomeAttributableToParent'] = [
+    ...(earning.metrics['NetIncomeLoss'] ?? []),
+  ]
 
   // OtherComprehensiveIncome
-  tags['OtherComprehensiveIncome'] =
-    earning.tags['OtherComprehensiveIncomeLossNetOfTax'] ||
-    earning.tags['OtherComprehensiveIncomeLossNetOfTax'] ||
-    0
+  tags['OtherComprehensiveIncome'] = [
+    ...(earning.metrics['OtherComprehensiveIncomeLossNetOfTax'] ?? []),
+    ...(earning.metrics['OtherComprehensiveIncomeLossNetOfTax'] ?? []),
+  ]
 
   // ComprehensiveIncome
-  tags['ComprehensiveIncome'] =
-    earning.tags[
+  tags['ComprehensiveIncome'] = [
+    ...earning.metrics[
       'ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest'
-    ]
-  earning.tags['ComprehensiveIncomeNetOfTax'] || undefined
+    ],
+    ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
+  ]
 
   // ComprehensiveIncomeAttributableToParent
-  tags['ComprehensiveIncomeAttributableToParent'] =
-    earning.tags['ComprehensiveIncomeNetOfTax'] ||
-    earning.tags['ComprehensiveIncomeNetOfTax'] ||
-    undefined
+  tags['ComprehensiveIncomeAttributableToParent'] = [
+    ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
+    ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
+  ]
 
   // ComprehensiveIncomeAttributableToNoncontrollingInterest
-  tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] =
-    earning.tags[
+  tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] = [
+    ...(earning.metrics[
       'ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest'
-    ] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics[
       'ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest'
-    ] ||
-    undefined
+    ] ?? []),
+  ]
 
   // 'Adjustments to income statement information
   // Impute: NonoperatingIncomeLossPlusInterestAndDebtExpense
@@ -852,73 +847,79 @@ export const load = (earning: Earnings) => {
   // Cash flow statement
 
   // NetCashFlow
-  tags['NetCashFlow'] =
-    earning.tags['CashAndCashEquivalentsPeriodIncreaseDecrease']
-  earning.tags['CashPeriodIncreaseDecrease'] ||
-    earning.tags['NetCashProvidedByUsedInContinuingOperations'] ||
-    0
+  tags['NetCashFlow'] = [
+    ...earning.metrics['CashAndCashEquivalentsPeriodIncreaseDecrease'],
+    ...(earning.metrics['CashPeriodIncreaseDecrease'] ?? []),
+    ...(earning.metrics['NetCashProvidedByUsedInContinuingOperations'] ?? []),
+  ]
 
   // NetCashFlowsOperating
-  tags['NetCashFlowsOperating'] =
-    earning.tags['NetCashProvidedByUsedInOperatingActivities'] || undefined
+  tags['NetCashFlowsOperating'] = [
+    ...(earning.metrics['NetCashProvidedByUsedInOperatingActivities'] ?? []),
+  ]
 
   // NetCashFlowsInvesting
-  tags['NetCashFlowsInvesting'] =
-    earning.tags['NetCashProvidedByUsedInInvestingActivities'] || undefined
+  tags['NetCashFlowsInvesting'] = [
+    ...(earning.metrics['NetCashProvidedByUsedInInvestingActivities'] ?? []),
+  ]
 
   // NetCashFlowsFinancing
-  tags['NetCashFlowsFinancing'] =
-    earning.tags['NetCashProvidedByUsedInFinancingActivities'] || undefined
+  tags['NetCashFlowsFinancing'] = [
+    ...(earning.metrics['NetCashProvidedByUsedInFinancingActivities'] ?? []),
+  ]
 
   // NetCashFlowsOperatingContinuing
-  tags['NetCashFlowsOperatingContinuing'] =
-    earning.tags[
+  tags['NetCashFlowsOperatingContinuing'] = [
+    ...(earning.metrics[
       'NetCashProvidedByUsedInOperatingActivitiesContinuingOperations'
-    ] || undefined
+    ] ?? []),
+  ]
 
   // NetCashFlowsInvestingContinuing
-  tags['NetCashFlowsInvestingContinuing'] =
-    earning.tags[
+  tags['NetCashFlowsInvestingContinuing'] = [
+    ...(earning.metrics[
       'NetCashProvidedByUsedInInvestingActivitiesContinuingOperations'
-    ] || undefined
+    ] ?? []),
+  ]
   // NetCashFlowsFinancingContinuing
   tags['NetCashFlowsFinancingContinuing'] =
-    earning.tags[
+    earning.metrics[
       'NetCashProvidedByUsedInFinancingActivitiesContinuingOperations'
-    ] || undefined
+    ]
 
   // NetCashFlowsOperatingDiscontinued
   tags['NetCashFlowsOperatingDiscontinued'] =
-    earning.tags[
+    earning.metrics[
       'CashProvidedByUsedInOperatingActivitiesDiscontinuedOperations'
-    ] || undefined
+    ]
 
   // NetCashFlowsInvestingDiscontinued
   tags['NetCashFlowsInvestingDiscontinued'] =
-    earning.tags[
+    earning.metrics[
       'CashProvidedByUsedInInvestingActivitiesDiscontinuedOperations'
-    ] || undefined
+    ]
 
   // NetCashFlowsFinancingDiscontinued
   tags['NetCashFlowsFinancingDiscontinued'] =
-    earning.tags[
+    earning.metrics[
       'CashProvidedByUsedInFinancingActivitiesDiscontinuedOperations'
-    ] || undefined
+    ]
 
   // NetCashFlowsDiscontinued
-  tags['NetCashFlowsDiscontinued'] =
-    earning.tags['NetCashProvidedByUsedInDiscontinuedOperations'] || undefined
+  tags['NetCashFlowsDiscontinued'] = [
+    ...(earning.metrics['NetCashProvidedByUsedInDiscontinuedOperations'] ?? []),
+  ]
 
   // ExchangeGainsLosses
-  tags['ExchangeGainsLosses'] =
-    earning.tags['EffectOfExchangeRateOnCashAndCashEquivalents'] ||
-    earning.tags[
+  tags['ExchangeGainsLosses'] = [
+    ...(earning.metrics['EffectOfExchangeRateOnCashAndCashEquivalents'] ?? []),
+    ...(earning.metrics[
       'EffectOfExchangeRateOnCashAndCashEquivalentsContinuingOperations'
-    ] ||
-    earning.tags[
+    ] ?? []),
+    ...(earning.metrics[
       'CashProvidedByUsedInFinancingActivitiesDiscontinuedOperations'
-    ] ||
-    0
+    ] ?? []),
+  ]
 
   // Adjustments
   // Impute: total net cash flows discontinued if not reported
@@ -1073,5 +1074,8 @@ export const load = (earning: Earnings) => {
   tags['ROE'] = getCalculateTag(tags['NetIncomeLoss'], tags['Equity'], '/')
 
   tags['ROS'] = getCalculateTag(tags['NetIncomeLoss'], tags['Revenues'], '/')
-  return tags
+  return {
+    ticker: earning.ticker,
+    metrics: tags,
+  } as EarningsMetric
 }

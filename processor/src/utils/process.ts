@@ -54,31 +54,32 @@ import {
 
 export const getCompaniesPercentGrowthEveryQuarter = (earnings: Earnings[]) => {
   const allCompaniesPercentGrowth = earnings.map((earning) => {
-    const allTags = load(earning)
-    const earningPercentGrowth = Object.entries(allTags)
+    const earningPercentGrowth = Object.entries(earning.tags)
       .map(([tag, data]: [string, TagData | undefined]) => {
-        if (!data) return undefined
+        if (!data || !data.units?.USD) return undefined
         const uniqueSortedReports = unique<Report>(
           sortReports(data.units.USD, 'end'),
-          (report) => report.fy + report.fp
+          (report) => report.end
         )
-        const samePeriodReports = getReportsByPeriod(uniqueSortedReports)
-        return calculateGrowthPercentPerQuarter(tag, samePeriodReports)
+        return calculateGrowthPercentPerQuarter(
+          tag,
+          uniqueSortedReports.filter((x) => x.form !== '10-K')
+        )
       })
-      .filter((x) => x) as {
+      .filter((x) => x && x.value) as {
       key: string
       value: ReportPretty[]
     }[]
     const earningPercentGrowthMap = objArrToObj<string, ReportPretty[]>(
       earningPercentGrowth
     )
-
     return {
       ticker: earning.ticker,
       metrics: earningPercentGrowthMap,
     } as EarningsMetric
   })
-  return allCompaniesPercentGrowth as EarningsMetric[]
+  const final = allCompaniesPercentGrowth.map((x) => load(x))
+  return final as EarningsMetric[]
 }
 
 export const getScore = (metics: Record<TagsKey, number>) =>
