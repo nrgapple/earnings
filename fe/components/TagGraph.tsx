@@ -4,6 +4,7 @@ import {
   Label,
   Line,
   LineChart,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -61,47 +62,46 @@ export const TagGraph = ({ reports }: Props) => {
   console.log(data)
 
   return (
-    <LineChart
-      width={1200}
-      height={750}
-      data={data}
-      margin={{ top: 20, right: 5, bottom: 50, left: 50 }}
-    >
-      {Object.keys(reports.metrics).map((x) => (
-        <>
+    <ResponsiveContainer width="100%" height={750}>
+      <LineChart
+        data={data}
+        margin={{ top: 20, right: 5, bottom: 50, left: 50 }}
+      >
+        {Object.keys(reports.metrics).map((x) => (
           <Line
+            key={x}
             type="monotone"
             dataKey={x}
             stroke={stringToColor(x)}
             connectNulls
           />
-        </>
-      ))}
-      <Tooltip
-        itemStyle={{ height: '1px' }}
-        labelFormatter={labelFormatter}
-        formatter={priceFormatter}
-        offset={50}
-        position={{ x: 0, y: -50 }}
-        allowEscapeViewBox={{ y: true }}
-      />
-      <XAxis dataKey={'name'} tickFormatter={labelFormatter}>
-        <Label position="insideBottom" offset={-30}>
-          Year and Quarter
-        </Label>
-      </XAxis>
-      <YAxis
-        scale={'sqrt'}
-        label={{
-          value: '$ / 100,000',
-          angle: -90,
-          position: 'insideLeft',
-          offset: -30,
-        }}
-        //interval={0}
-        tickFormatter={priceFormatter}
-      />
-      <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-    </LineChart>
+        ))}
+        <Tooltip
+          itemStyle={{ height: '1px' }}
+          labelFormatter={labelFormatter}
+          formatter={priceFormatter}
+          offset={50}
+          position={{ x: 0, y: -50 }}
+          allowEscapeViewBox={{ y: true }}
+        />
+        <XAxis dataKey={'name'} tickFormatter={labelFormatter}>
+          <Label position="insideBottom" offset={-30}>
+            Year and Quarter
+          </Label>
+        </XAxis>
+        <YAxis
+          scale={'sqrt'}
+          label={{
+            value: '$ / 100,000',
+            angle: -90,
+            position: 'insideLeft',
+            offset: -30,
+          }}
+          //interval={0}
+          tickFormatter={priceFormatter}
+        />
+        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+      </LineChart>
+    </ResponsiveContainer>
   )
 }

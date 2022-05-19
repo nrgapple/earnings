@@ -133,3 +133,9 @@ export interface ScoresData {
   growths: Record<TagsKey, number>
   normalized: Record<TagsKey, number>
 }
+
+export interface EarningsResp {
+  earnings: EarningsMetric[]
+  pages: number
+  current: number
+}
