@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import {
   CartesianGrid,
   Label,
-  Legend,
   Line,
   LineChart,
   Tooltip,
