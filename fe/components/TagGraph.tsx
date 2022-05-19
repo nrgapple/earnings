@@ -62,10 +62,10 @@ export const TagGraph = ({ reports }: Props) => {
   console.log(data)
 
   return (
-    <ResponsiveContainer width="100%" height={750}>
+    <ResponsiveContainer width="100%" height={750} debounce={200}>
       <LineChart
         data={data}
-        margin={{ top: 20, right: 5, bottom: 50, left: 50 }}
+        margin={{ top: 20, right: 5, bottom: 50, left: 20 }}
       >
         {Object.keys(reports.metrics).map((x) => (
           <Line
@@ -95,7 +95,7 @@ export const TagGraph = ({ reports }: Props) => {
             value: '$ / 100,000',
             angle: -90,
             position: 'insideLeft',
-            offset: -30,
+            offset: -10,
           }}
           //interval={0}
           tickFormatter={priceFormatter}
