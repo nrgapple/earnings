@@ -91,10 +91,14 @@ export const load = (earning: EarningsMetric) => {
   tags['Liabilities'] = [...(earning.metrics['Liabilities'] ?? [])]
 
   // CurrentLiabilities
-  tags['CurrentLiabilities'] = [...earning.metrics['LiabilitiesCurrent']]
+  tags['CurrentLiabilities'] = [
+    ...(earning.metrics['LiabilitiesCurrent'] ?? []),
+  ]
 
   // Noncurrent Liabilities
-  tags['NoncurrentLiabilities'] = [...earning.metrics['LiabilitiesNoncurrent']]
+  tags['NoncurrentLiabilities'] = [
+    ...(earning.metrics['LiabilitiesNoncurrent'] ?? []),
+  ]
   if (tags['NoncurrentLiabilities'] === null) {
     if (tags['Liabilities'] && tags['CurrentLiabilities']) {
       tags['NoncurrentLiabilities'] = getCalculateTag(
@@ -467,9 +471,9 @@ export const load = (earning: EarningsMetric) => {
 
   // ComprehensiveIncome
   tags['ComprehensiveIncome'] = [
-    ...earning.metrics[
+    ...(earning.metrics[
       'ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest'
-    ],
+    ] ?? []),
     ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
   ]
 
@@ -848,7 +852,7 @@ export const load = (earning: EarningsMetric) => {
 
   // NetCashFlow
   tags['NetCashFlow'] = [
-    ...earning.metrics['CashAndCashEquivalentsPeriodIncreaseDecrease'],
+    ...(earning.metrics['CashAndCashEquivalentsPeriodIncreaseDecrease'] ?? []),
     ...(earning.metrics['CashPeriodIncreaseDecrease'] ?? []),
     ...(earning.metrics['NetCashProvidedByUsedInContinuingOperations'] ?? []),
   ]
