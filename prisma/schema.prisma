@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
+}
+
+model Company {
+  ticker    String    @id
+  id        String    @unique @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  Report    Report[]
+
+}
+
+model Report {
+  id            String    @id @default(uuid())
+  tag           String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime?
+  val           Float?
+  end           DateTime
+  start         DateTime?
+  fp            String
+  fy            Int
+  Company       Company?  @relation(fields: [companyTicker], references: [ticker])
+  companyTicker String?
+
+  @@unique([fp, fy, tag, companyTicker])
+  @@index([tag])
+}

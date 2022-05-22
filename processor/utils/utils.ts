@@ -20,6 +20,16 @@ export const unique = <T extends unknown>(arr: T[], func: (v: T) => string) => {
   return [...result.values()]
 }
 
+export const groupBy = <T>(arr: T[], func: (v: T) => string) => {
+  return arr.reduce((prev, curr) => {
+    const key = func(curr)
+    return {
+      ...prev,
+      [key]: [...(prev[key] ?? []), curr],
+    }
+  }, {} as Record<string, T[]>)
+}
+
 export const unique2 = <T extends unknown>(
   arr: T[],
   func: (v: T) => string
@@ -126,53 +136,53 @@ export const objArrToObj = <T extends string, TV extends unknown>(
   return result
 }
 
-export const convertCurrencies = (currencies: { [key: string]: Report[] }) => {
-  const newCurrencies = {} as Record<string, Report[]>
-  Object.keys(currencies).forEach((key) => {
-    const currencyConverter = new CC({ from: key, to: 'USD', amount: 100 })
-    newCurrencies[key] = currencyConverter
-  })
+// export const convertCurrencies = (currencies: { [key: string]: Report[] }) => {
+//   const newCurrencies = {} as Record<string, Report[]>
+//   Object.keys(currencies).forEach((key) => {
+//     const currencyConverter = new CC({ from: key, to: 'USD', amount: 100 })
+//     newCurrencies[key] = currencyConverter
+//   })
 
-  return newCurrencies
-}
+//   return newCurrencies
+// }
 
-export const calculateGrowthPercentPerQuarter = (
-  tag: string,
-  reports: Report[]
-) => {
-  if (!reports.length)
-    return {
-      key: tag as keyof TagsObject,
-      value: [],
-    }
-  const { percent, reportsData } = reports.reduce(
-    (previous, currentReport) => {
-      const percentGrowth = previous.previousReport
-        ? calcPercentGrowth(previous.previousReport, currentReport)
-        : undefined
-      previous.reportsData.push({
-        end: currentReport.end,
-        val: currentReport.val,
-      })
-      return {
-        percent: percentGrowth
-          ? percentGrowth + previous.percent
-          : previous.percent,
-        previousReport: currentReport,
-        reportsData: previous.reportsData,
-      }
-    },
-    {
-      percent: 0,
-      previousReport: undefined as Report | undefined,
-      reportsData: [] as ReportPretty[],
-    }
-  )
-  return {
-    key: tag as keyof TagsObject,
-    value: reportsData,
-  }
-}
+// export const calculateGrowthPercentPerQuarter = (
+//   tag: string,
+//   reports: Report[]
+// ) => {
+//   if (!reports.length)
+//     return {
+//       key: tag as keyof TagsObject,
+//       value: [],
+//     }
+//   const { percent, reportsData } = reports.reduce(
+//     (previous, currentReport) => {
+//       const percentGrowth = previous.previousReport
+//         ? calcPercentGrowth(previous.previousReport, currentReport)
+//         : undefined
+//       previous.reportsData.push({
+//         end: currentReport.end,
+//         val: currentReport.val,
+//       })
+//       return {
+//         percent: percentGrowth
+//           ? percentGrowth + previous.percent
+//           : previous.percent,
+//         previousReport: currentReport,
+//         reportsData: previous.reportsData,
+//       }
+//     },
+//     {
+//       percent: 0,
+//       previousReport: undefined as Report | undefined,
+//       reportsData: [] as ReportPretty[],
+//     }
+//   )
+//   return {
+//     key: tag as keyof TagsObject,
+//     value: reportsData,
+//   }
+// }
 
 function monthDiff(d1: Date, d2: Date) {
   var months
@@ -237,7 +247,6 @@ export const addQ4IfMissing = (reports: ReportPretty[]) => {
           })
         }
       }
-
       values.result.push({
         ...currReport,
       })

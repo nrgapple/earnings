@@ -1033,51 +1033,51 @@ export const load = (earning: EarningsMetric) => {
   const AssetsEquity = getCalculateTag(tags['Assets'], tags['Equity'], '-')
   const RevenuesAssets = getCalculateTag(tags['Revenues'], tags['Assets'], '/')
   // Key ratios
-  if (NetIncomeLossRevenues && AssetsEquity && RevenuesAssets) {
-    const AssetsEquityEquity = getCalculateTag(
-      AssetsEquity,
-      tags['Equity'],
-      '/'
-    )
-    if (AssetsEquityEquity) {
-      const AddOneToAssetsEquityEquity = calcNumberToTag(
-        1,
-        AssetsEquityEquity,
-        '+'
-      )
-      const DivideOneToRevenuesAssets = calcNumberToTag(1, RevenuesAssets, '/')
-      if (
-        AssetsEquityEquity &&
-        AddOneToAssetsEquityEquity &&
-        DivideOneToRevenuesAssets
-      ) {
-        tags['SGR'] =
-          getCalculateTag(
-            getCalculateTag(
-              NetIncomeLossRevenues,
-              AddOneToAssetsEquityEquity!,
-              '*'
-            ),
-            getCalculateTag(
-              DivideOneToRevenuesAssets,
-              getCalculateTag(
-                NetIncomeLossRevenues,
-                AddOneToAssetsEquityEquity!,
-                '*'
-              ),
-              '-'
-            ),
-            '/'
-          ) || undefined
-      }
-    }
-  }
+  // if (NetIncomeLossRevenues && AssetsEquity && RevenuesAssets) {
+  //   const AssetsEquityEquity = getCalculateTag(
+  //     AssetsEquity,
+  //     tags['Equity'],
+  //     '/'
+  //   )
+  //   if (AssetsEquityEquity) {
+  //     const AddOneToAssetsEquityEquity = calcNumberToTag(
+  //       1,
+  //       AssetsEquityEquity,
+  //       '+'
+  //     )
+  //     const DivideOneToRevenuesAssets = calcNumberToTag(1, RevenuesAssets, '/')
+  //     if (
+  //       AssetsEquityEquity &&
+  //       AddOneToAssetsEquityEquity &&
+  //       DivideOneToRevenuesAssets
+  //     ) {
+  //       tags['SGR'] =
+  //         getCalculateTag(
+  //           getCalculateTag(
+  //             NetIncomeLossRevenues,
+  //             AddOneToAssetsEquityEquity!,
+  //             '*'
+  //           ),
+  //           getCalculateTag(
+  //             DivideOneToRevenuesAssets,
+  //             getCalculateTag(
+  //               NetIncomeLossRevenues,
+  //               AddOneToAssetsEquityEquity!,
+  //               '*'
+  //             ),
+  //             '-'
+  //           ),
+  //           '/'
+  //         ) || undefined
+  //     }
+  //   }
+  // }
 
-  tags['ROA'] = getCalculateTag(tags['NetIncomeLoss'], tags['Assets'], '/')
+  // tags['ROA'] = getCalculateTag(tags['NetIncomeLoss'], tags['Assets'], '/')
 
-  tags['ROE'] = getCalculateTag(tags['NetIncomeLoss'], tags['Equity'], '/')
+  // tags['ROE'] = getCalculateTag(tags['NetIncomeLoss'], tags['Equity'], '/')
 
-  tags['ROS'] = getCalculateTag(tags['NetIncomeLoss'], tags['Revenues'], '/')
+  // tags['ROS'] = getCalculateTag(tags['NetIncomeLoss'], tags['Revenues'], '/')
   return {
     ticker: earning.ticker,
     metrics: tags,

@@ -51,12 +51,11 @@ export interface Report {
 
 export interface ReportPretty {
   val?: number
-  form?: string
-  fy?: number
-  fp?: string
+  fy: number
+  fp: string
   start?: string
   end: string
-  percentGrowthYoY?: number | undefined
+  filed?: string
 }
 
 export interface CompanyProfile {

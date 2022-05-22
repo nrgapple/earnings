@@ -14,6 +14,7 @@ import {
   unique,
   getQuarterFromEndDate,
   addQ4IfMissing,
+  groupBy,
 } from './utils'
 
 // export const normalizeValues = (earnings: EarningsMetric[]) => {
@@ -65,14 +66,22 @@ const cleanCompanyEarnings = (earning: Earnings) => {
           sortReports(reports, 'end'),
           (report) => report.end
         ).map((x) => ({
+          start: x.start,
           end: x.end,
           val: x.val,
           fp: getQuarterFromEndDate(x).fp,
           fy: getQuarterFromEndDate(x).fy,
         }))
-        record[tag] = addQ4IfMissing(uniqueSortedReports).filter(
-          (x) => x.fp !== 'FY'
-        )
+        record[tag] = Object.values(
+          groupBy(
+            addQ4IfMissing(uniqueSortedReports).filter((x) => x.fp !== 'FY'),
+            (report) => report.fy + report.fp
+          )
+        ).flatMap((values) => {
+          return [...values].sort((a, b) =>
+            new Date(a.end).getTime() > new Date(b.end).getTime() ? -1 : 1
+          )[0]
+        })
         return record
       }, {} as Record<string, ReportPretty[]>),
   } as EarningsMetric

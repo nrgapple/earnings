@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import { CalendarEarnings, ReportResp, TickerInfo } from '../types'
 import { errorsCache } from '../utils/utils'
 
