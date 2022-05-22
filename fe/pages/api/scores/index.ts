@@ -5,10 +5,8 @@ import { EarningsMetric, EarningsResp } from '../../../interfaces'
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   const redis = new Redis(process.env.REDIS_URL)
   try {
-    console.log('ready')
     const data = await redis.get('data')
     const { page } = _req.query
-    console.log({ data })
     const dataJson = JSON.parse(data)
     if (!Array.isArray(dataJson)) {
       throw new Error('Cannot find data')

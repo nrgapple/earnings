@@ -8,8 +8,8 @@ import {
   Text,
 } from '@nextui-org/react'
 import { useState } from 'react'
-import { TagGraph } from '../../../components/TagGraph'
 import { EarningsResp } from '../../../interfaces'
+import { TagGraph } from '../../../components/TagGraph'
 
 // @ts-ignore
 const fetcher = async (...args) => {

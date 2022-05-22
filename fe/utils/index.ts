@@ -20,3 +20,13 @@ export const currencyFormatter = (currency: string = 'USD') =>
     style: 'currency',
     currency,
   })
+
+export const labelFormatter = (v: number) => {
+  return new Date(v * 1000).toLocaleDateString('en-US')
+}
+
+export const priceFormatter = (v) => {
+  return currencyFormatter('USD')
+    .format(v / 100000)
+    .slice(0, -3)
+}
