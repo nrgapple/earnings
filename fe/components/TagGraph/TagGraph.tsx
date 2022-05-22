@@ -1,63 +1,29 @@
 import { useMemo } from 'react'
 import {
   CartesianGrid,
+  DotProps,
   Label,
   Line,
   LineChart,
   ResponsiveContainer,
   Tooltip,
+  TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts'
-import { EarningsMetric } from '../interfaces'
+import { EarningsMetric } from '../../interfaces'
 import stringToColor from 'string-to-color'
-import { currencyFormatter } from '../utils'
+import { labelFormatter, priceFormatter } from '../../utils'
+import { useTagGraph } from './useTagGraph'
+import { Card, Grid, Text } from '@nextui-org/react'
 
-import { scaleLog } from 'd3-scale'
-const scale = scaleLog().base(10)
-
-interface Props {
+export interface TagGraphProps {
   reports: EarningsMetric
 }
 
-const labelFormatter = (v: number) => {
-  const value = v.toString()
-  return new Date(v * 1000).toLocaleDateString('en-US')
-}
-
-const priceFormatter = (v) => {
-  return currencyFormatter('USD')
-    .format(v / 100000)
-    .slice(0, -3)
-}
-
-export const TagGraph = ({ reports }: Props) => {
-  const data = useMemo(() => {
-    const allData = Object.entries(reports.metrics).flatMap(
-      ([tag, reports]) => {
-        return reports.map((x) => {
-          return {
-            name: new Date(x.end).getTime() / 1000,
-            [tag]: x.val,
-          }
-        })
-      }
-    )
-    return allData
-      .reduce((prev, curr) => {
-        const x = prev.find((x) => x.name === curr.name)
-        if (x) {
-          x[Object.keys(curr)[1]] = curr[Object.keys(curr)[1]]
-        } else {
-          prev.push({
-            name: curr.name,
-            [Object.keys(curr)[1]]: curr[Object.keys(curr)[1]],
-          })
-        }
-        return prev
-      }, [])
-      .sort((a, b) => a.name - b.name)
-  }, [reports])
+export const TagGraph = ({ reports }: TagGraphProps) => {
+  const { data, dot } = useTagGraph({ reports })
+  const [currDot, setCurrDot] = dot
 
   return (
     <ResponsiveContainer width="100%" height={750} debounce={200}>
@@ -67,6 +33,14 @@ export const TagGraph = ({ reports }: Props) => {
       >
         {Object.keys(reports.metrics).map((x) => (
           <Line
+            activeDot={{
+              onMouseEnter(_, event) {
+                setCurrDot(event)
+              },
+              onMouseLeave(_, event) {
+                setCurrDot(undefined)
+              },
+            }}
             key={x}
             type="monotone"
             dataKey={x}
@@ -78,9 +52,10 @@ export const TagGraph = ({ reports }: Props) => {
           itemStyle={{ height: '1px' }}
           labelFormatter={labelFormatter}
           formatter={priceFormatter}
-          offset={50}
-          position={{ x: 0, y: -50 }}
           allowEscapeViewBox={{ y: true }}
+          content={(props: TooltipProps<number, number>) => (
+            <CustomTooltip {...props} dot={currDot} />
+          )}
         />
         <XAxis dataKey={'name'} tickFormatter={labelFormatter}>
           <Label position="insideBottom" offset={-30}>
@@ -102,4 +77,28 @@ export const TagGraph = ({ reports }: Props) => {
       </LineChart>
     </ResponsiveContainer>
   )
+}
+
+const CustomTooltip = ({
+  active,
+  dot,
+}: TooltipProps<number, number> & { dot: DotProps }) => {
+  if (active && dot) {
+    return (
+      <Card css={{ width: '12rem' }}>
+        <Grid.Container css={{ zIndex: 9999 }}>
+          <Grid xs={12}>
+            <Text h5>{labelFormatter(dot['payload']['name'])}</Text>
+          </Grid>
+          <Grid xs={12}>
+            <Text color={dot['fill']}>{`${dot['dataKey']} : ${priceFormatter(
+              dot['value']
+            )}`}</Text>
+          </Grid>
+        </Grid.Container>
+      </Card>
+    )
+  }
+
+  return null
 }
