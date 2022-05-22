@@ -34,6 +34,7 @@ export interface TagData {
   units: {
     USD: Report[]
     CNY: Report[]
+    [key: string]: Report[]
   }
 }
 
@@ -83,3 +84,8 @@ export interface TickerInfo {
 }
 
 export type Defined<T> = Exclude<T, undefined>
+
+export interface EarningMap {
+  key: string
+  value: ReportPretty[]
+}

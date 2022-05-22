@@ -6,15 +6,16 @@ import {
   TagData,
   Report,
   ReportPretty,
+  EarningMap,
 } from '../types'
 import { load } from './parser'
 import {
-  calculateGrowthPercentPerQuarter,
   sumFunc,
   sortReports,
   objArrToObj,
-  getReportsByPeriod,
   unique,
+  getQuarterFromEndDate,
+  addQ4IfMissing,
 } from './utils'
 
 // export const normalizeValues = (earnings: EarningsMetric[]) => {
@@ -52,34 +53,40 @@ import {
  * @returns the score for every companies.
  */
 
-export const getCompaniesPercentGrowthEveryQuarter = (earnings: Earnings[]) => {
-  const allCompaniesPercentGrowth = earnings.map((earning) => {
-    const earningPercentGrowth = Object.entries(earning.tags)
-      .map(([tag, data]: [string, TagData | undefined]) => {
-        if (!data || !data.units?.USD) return undefined
-        const uniqueSortedReports = unique<Report>(
-          sortReports(data.units.USD, 'end'),
-          (report) => report.end
-        )
-        return calculateGrowthPercentPerQuarter(
-          tag,
-          uniqueSortedReports.filter((x) => x.form !== '10-K')
-        )
-      })
-      .filter((x) => x && x.value) as {
-      key: string
-      value: ReportPretty[]
-    }[]
-    const earningPercentGrowthMap = objArrToObj<string, ReportPretty[]>(
-      earningPercentGrowth
-    )
+export const cleanEarningsData = (earnings: Earnings[]) => {
+  return earnings.map((earning) => {
+    const earningMapArr = Object.entries(earning.tags)
+      .map(
+        ([tag, tagData]) =>
+          ({
+            key: tag,
+            value: tagData.units.USD,
+          } as EarningMap)
+      )
+      .filter((x) => x.value)
+    const earningMap2 = objArrToObj<string, ReportPretty[]>(earningMapArr)
+    const parsedMetrics = load({ ticker: earning.ticker, metrics: earningMap2 })
     return {
-      ticker: earning.ticker,
-      metrics: earningPercentGrowthMap,
+      ...parsedMetrics,
+      metrics: Object.entries(parsedMetrics.metrics)
+        .filter((x) => x[1])
+        .reduce((record, [tag, reports]) => {
+          const uniqueSortedReports = unique<ReportPretty>(
+            sortReports(reports, 'end'),
+            (report) => report.end
+          ).map((x) => ({
+            end: x.end,
+            val: x.val,
+            fp: getQuarterFromEndDate(x).fp,
+            fy: getQuarterFromEndDate(x).fy,
+          }))
+          record[tag] = addQ4IfMissing(uniqueSortedReports).filter(
+            (x) => x.fp !== 'FY'
+          )
+          return record
+        }, {} as Record<string, ReportPretty[]>),
     } as EarningsMetric
   })
-  const final = allCompaniesPercentGrowth.map((x) => load(x))
-  return final as EarningsMetric[]
 }
 
 export const getScore = (metics: Record<TagsKey, number>) =>

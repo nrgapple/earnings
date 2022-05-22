@@ -51,7 +51,10 @@ export const getChunks = (a: unknown[], size: number) =>
     a.slice(i * size, i * size + size)
   )
 
-export const sortReports = (reports: Report[], field1: keyof Report) => {
+export const sortReports = (
+  reports: ReportPretty[],
+  field1: keyof ReportPretty
+) => {
   return reports.sort(
     (a, b) => new Date(a[field1]!).getTime() - new Date(b[field1]!).getTime()
   )
@@ -100,29 +103,6 @@ export const getDomesticCompanies = (earning: Earnings[]) => {
       return false
     })
   })
-}
-
-/**
- * Provided a list of reports,
- *
- * @param reports list of all the reports for a tag.
- * @param period report quarter
- * @returns
- */
-
-export const getReportsByPeriod = (
-  reports: Report[],
-  period?: 'Q1' | 'Q2' | 'Q3' | 'FY'
-) => {
-  const mostRecentReport = reports[reports.length - 1]
-  if (!period && !mostRecentReport) return []
-  const reportPeriod = period || mostRecentReport.fp
-  const newReports = reports.filter(
-    (report) =>
-      report.fp === reportPeriod &&
-      report.form === (period === 'FY' ? '10-K' : '10-Q')
-  )
-  return newReports
 }
 
 export const sumFunc = <T extends number>(a: T, b: T) => a + b
@@ -196,8 +176,76 @@ export const calculateGrowthPercentPerQuarter = (
   }
 }
 
-export const currencyFormatter = (currency: string = 'USD') =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  })
+function monthDiff(d1: Date, d2: Date) {
+  var months
+  months = (d2.getFullYear() - d1.getFullYear()) * 12
+  months -= d1.getMonth()
+  months += d2.getMonth()
+  return months <= 0 ? 0 : months
+}
+
+export const getQuarterFromEndDate = (report: ReportPretty) => {
+  const endMonth = Number(report.end.split('-')[1])
+  const endYear = Number(report.end.split('-')[0])
+  let fp
+  let fy = endYear
+  if (endMonth > 2 && endMonth < 5) {
+    fp = 'Q1'
+  } else if (endMonth > 5 && endMonth < 8) {
+    fp = 'Q2'
+  } else if (endMonth > 8 && endMonth < 11) {
+    fp = 'Q3'
+  } else {
+    const monthsBetween = report.start
+      ? monthDiff(new Date(report.start), new Date(report.end))
+      : undefined
+    if (monthsBetween && monthsBetween > 6) {
+      fp = 'FY'
+    } else {
+      fp = 'Q4'
+    }
+    if (endMonth === 1) {
+      fy = fy - 1
+    }
+  }
+  return {
+    fp,
+    fy,
+  }
+}
+
+export const addQ4IfMissing = (reports: ReportPretty[]) => {
+  const reportsWithQ4 = reports.reduce(
+    (values, currReport) => {
+      if (currReport.fp === 'FY') {
+        const allQuarterReportsForYear = reports.filter(
+          (x) => x.fy === currReport.fy && x.fp !== 'FY'
+        )
+        if (allQuarterReportsForYear.length === 3) {
+          const firstThreeQuarterRevs = allQuarterReportsForYear.reduce(
+            (totalRevs, rep) => {
+              totalRevs += rep.val ?? 0
+              return totalRevs
+            },
+            0
+          )
+          values.result.push({
+            ...currReport,
+            start: allQuarterReportsForYear[2].end,
+            val: currReport.val
+              ? currReport.val - firstThreeQuarterRevs
+              : undefined,
+            fp: 'Q4',
+          })
+        }
+      }
+
+      values.result.push({
+        ...currReport,
+      })
+      return values
+    },
+    { result: [] as ReportPretty[] }
+  )
+  return reportsWithQ4.result
+}

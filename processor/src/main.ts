@@ -5,7 +5,7 @@ import {
   getCachedEarnings,
   setCachedEarnings,
 } from './data/dataCache'
-import { getCompaniesPercentGrowthEveryQuarter } from './utils/process'
+import { cleanEarningsData } from './utils/process'
 import { Earnings } from './types'
 import { errorsCache, getDomesticCompanies } from './utils'
 import Redis from 'ioredis'
@@ -28,11 +28,10 @@ const main = async () => {
     const filePath = `${config.filePath}/${config.date}.json`
     const earnings = await getEarnings(filePath)
     const domesticEarnings = getDomesticCompanies(earnings)
-    const companiesPercentageGrowth =
-      getCompaniesPercentGrowthEveryQuarter(domesticEarnings)
-    console.log(JSON.stringify(companiesPercentageGrowth).length / 1000)
+    const companiesCleaned = cleanEarningsData(domesticEarnings)
+    console.log(JSON.stringify(companiesCleaned).length / 1000)
     await redis.del('data')
-    await redis.set('data', JSON.stringify(companiesPercentageGrowth))
+    await redis.set('data', JSON.stringify(companiesCleaned))
   } catch (e) {
     errorsCache.push(e)
   } finally {
