@@ -1,14 +1,15 @@
 export interface Company {
   ticker: string
   id: string
-  tags: Tag[]
+  tags: Record<string, Report[]>
 }
 
-export interface Tag {
-  name: string
+export interface DBCompany {
+  ticker: string
   id: string
   reports: Report[]
 }
+
 export interface Report {
   id: string
   val: number | undefined
@@ -16,6 +17,7 @@ export interface Report {
   start: Date
   fp: string
   fy: number
+  tag: string
 }
 
 export interface CompanyProfile {

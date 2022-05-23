@@ -1,6 +1,8 @@
+import { Prisma, PrismaClient } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Company, CompaniesResp } from '../../../interfaces'
+import { Company, CompaniesResp, DBCompany } from '../../../interfaces'
 import prisma from '../../../lib/prisma'
+import { groupBy } from '../../../processor/utils'
 
 const count = 10
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
@@ -15,33 +17,31 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     const cursor = p * count
     const endAmount =
       companyCount - cursor < count ? companyCount - cursor : count
-    const companies = (await prisma.company.findMany({
-      where: {
-        ticker: 'AAPL',
-      },
-      // skip: cursor,
-      // take: endAmount,
+    const dbCompanies = (await prisma.company.findMany({
+      skip: cursor,
+      take: endAmount,
       include: {
-        tags: {
-          include: {
-            reports: true,
-          },
-        },
+        reports: true,
       },
-    })) as Company[]
+    })) as DBCompany[]
 
-    if (!Array.isArray(companies)) {
+    if (!Array.isArray(dbCompanies)) {
       throw new Error('Cannot find data')
     }
-
-    console.log('earnings', companies)
 
     console.log({
       endAmount,
       cusser: p * 10,
-      l: companies.length,
-      dl: companies.length,
+      l: dbCompanies.length,
+      dl: dbCompanies.length,
     })
+    const companies = dbCompanies.map(
+      (c) =>
+        ({
+          ...c,
+          tags: groupBy(c.reports, (v) => v.tag),
+        } as Company)
+    )
 
     res.status(200).json({
       companies,

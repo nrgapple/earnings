@@ -1,14 +1,15 @@
+import { report } from 'process'
 import { useMemo, useState } from 'react'
 import { TagGraphProps } from './TagGraph'
 
 export const useTagGraph = ({ tags }: TagGraphProps) => {
   const dot = useState<any>()
   const data = useMemo(() => {
-    const allData = tags.flatMap(({ name, reports }) => {
+    const allData = Object.entries(tags).flatMap(([key, reports]) => {
       return reports.map((x) => {
         return {
           name: new Date(x.end).getTime() / 1000,
-          [name]: x.val,
+          [key]: x.val,
         }
       })
     })

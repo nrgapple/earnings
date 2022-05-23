@@ -15,10 +15,10 @@ import stringToColor from 'string-to-color'
 import { labelFormatter, priceFormatter } from '../../utils'
 import { useTagGraph } from './useTagGraph'
 import { Card, Grid, Text } from '@nextui-org/react'
-import { Tag } from '../../interfaces'
+import { Report } from '../../interfaces'
 
 export interface TagGraphProps {
-  tags: Tag[]
+  tags: Record<string, Report[]>
 }
 
 export const TagGraph = ({ tags }: TagGraphProps) => {
@@ -31,7 +31,7 @@ export const TagGraph = ({ tags }: TagGraphProps) => {
         data={data}
         margin={{ top: 20, right: 5, bottom: 50, left: 20 }}
       >
-        {tags.map((x) => (
+        {Object.keys(tags).map((key) => (
           <Line
             activeDot={{
               onMouseEnter(_, event) {
@@ -41,10 +41,10 @@ export const TagGraph = ({ tags }: TagGraphProps) => {
                 setCurrDot(undefined)
               },
             }}
-            key={x.id}
+            key={key}
             type="monotone"
-            dataKey={x.name}
-            stroke={stringToColor(x)}
+            dataKey={key}
+            stroke={stringToColor(key)}
             connectNulls
           />
         ))}
