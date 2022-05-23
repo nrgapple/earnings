@@ -91,7 +91,6 @@ const Earnings = () => {
               total={data.pages}
               page={pageNumber}
               onChange={(p) => {
-                console.log('here')
                 setPageNumber(p)
               }}
             />
@@ -103,7 +102,6 @@ const Earnings = () => {
                 total={data.pages}
                 page={pageNumber}
                 onChange={(p) => {
-                  console.log('here')
                   setPageNumber(p)
                 }}
               />

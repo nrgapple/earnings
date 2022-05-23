@@ -44,12 +44,6 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       throw new Error('Cannot find data')
     }
 
-    console.log({
-      endAmount,
-      cusser: p * 10,
-      l: dbCompanies.length,
-      dl: dbCompanies.length,
-    })
     const companies = dbCompanies.map(
       (c) =>
         ({
