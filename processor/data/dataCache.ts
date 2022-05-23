@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { Earnings } from '../types'
+import { Earnings, ReportResp } from '../types'
 
 const fsPromise = fs.promises
 

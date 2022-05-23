@@ -102,14 +102,16 @@ export const getConfiguredTags = <T extends unknown>(
 
 export const getDomesticCompanies = (earning: Earnings[]) => {
   return earning.filter((earnings) => {
-    return Object.values(earnings.tags).find((tagData: TagData) => {
-      if (tagData.units.USD) {
-        return !!tagData.units.USD.find((report) => {
-          return report.form === '10-K' || report.form === '10-Q'
+    return earnings.tags
+      ? Object.values(earnings.tags).find((tagData: TagData) => {
+          if (tagData.units.USD) {
+            return !!tagData.units.USD.find((report) => {
+              return report.form === '10-K' || report.form === '10-Q'
+            })
+          }
+          return false
         })
-      }
-      return false
-    })
+      : false
   })
 }
 

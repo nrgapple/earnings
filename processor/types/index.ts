@@ -77,9 +77,9 @@ export interface CalendarEarnings {
 }
 
 export interface TickerInfo {
-  cik_str: number
+  cik_str: number | string
   ticker: string
-  title: string
+  title?: string
 }
 
 export type Defined<T> = Exclude<T, undefined>

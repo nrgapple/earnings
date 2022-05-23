@@ -37,6 +37,16 @@ const getCompaniesEarningsByChunks = async (
   return reports
 }
 
+export const getAllCompanyData = async () => {
+  return Object.values(await getCompanyTickers()).map(
+    (data) =>
+      ({
+        ticker: data.ticker,
+        cik_str: `${data.cik_str}`.padStart(10, '0'),
+      } as TickerInfo)
+  )
+}
+
 /**
  * Gets all companies earning reports released on the date provided.
  *
@@ -53,7 +63,7 @@ export const getAllEarningReportsByDate = async (date: string) => {
       allTickers.find(
         (x) =>
           x.ticker === earning.symbol ||
-          x.title.toLowerCase() === earning.name.trim().toLowerCase()
+          x.title?.toLowerCase() === earning.name.trim().toLowerCase()
       )
     )
     const tickersToUse = [...earningsTickers.slice(0)]

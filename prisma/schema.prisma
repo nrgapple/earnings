@@ -13,30 +13,22 @@ model Company {
   id        String    @unique @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime?
-  tags      Tag[]
-}
-
-model Tag {
-  id            String   @unique @default(uuid())
-  name          String
-  reports       Report[]
-  companyTicker String?
-  company       Company? @relation(fields: [companyTicker], references: [ticker])
-
-  @@unique([name, companyTicker])
+  reports   Report[]
 }
 
 model Report {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime?
-  val       Float?
-  end       DateTime
-  start     DateTime?
-  fp        String
-  fy        Int
-  tag       Tag?      @relation(fields: [tagId], references: [id])
-  tagId     String?
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime?
+  val           Float?
+  end           DateTime
+  start         DateTime?
+  fp            String
+  fy            Int
+  tag           String
+  Company       Company?  @relation(fields: [companyTicker], references: [ticker])
+  companyTicker String?
 
-  @@unique([fp, fy, tagId])
+  @@unique([fy, fp, tag, companyTicker])
+  @@index([tag])
 }

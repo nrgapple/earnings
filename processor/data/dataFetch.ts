@@ -38,7 +38,16 @@ export const getEarningsCalendar = async (
 export const getCompanyTickers = async (): Promise<{
   [key: string]: TickerInfo
 }> => {
-  const tickers = await fetch('https://www.sec.gov/files/company_tickers.json')
+  const tickers = await fetch(
+    'https://www.sec.gov/files/company_tickers.json',
+    {
+      headers: {
+        Accept: 'application/json',
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36',
+      },
+    }
+  )
   return tickers.json()
 }
 
