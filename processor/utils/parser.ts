@@ -39,7 +39,7 @@ const getCalculateTag = (
   return reports1
     .map((r1) => {
       const otherReport = report2.find(
-        (r2) => r2.end === r1.end && r1.form === r2.form
+        (r2) => r2.end === r1.end && r1.fp === r2.fp && r1.fy === r2.fy
       )
       if (otherReport) {
         let val = undefined
