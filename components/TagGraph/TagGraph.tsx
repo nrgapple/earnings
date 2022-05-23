@@ -21,8 +21,9 @@ export interface TagGraphProps {
   tags: Record<string, Report[]>
 }
 
-export const TagGraph = ({ tags }: TagGraphProps) => {
-  const { data, dot } = useTagGraph({ tags })
+export const TagGraph = (props: TagGraphProps) => {
+  const { data, dot } = useTagGraph(props)
+  const { tags } = props
   const [currDot, setCurrDot] = dot
 
   return (

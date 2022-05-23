@@ -1,4 +1,3 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Company, CompaniesResp, DBCompany } from '../../../interfaces'
 import prisma from '../../../lib/prisma'

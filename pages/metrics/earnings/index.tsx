@@ -1,8 +1,10 @@
 import useSWR from 'swr'
 import {
+  Button,
   Card,
   Container,
   Grid,
+  Input,
   Loading,
   Pagination,
   Text,
@@ -21,10 +23,13 @@ const fetcher = async (...args) => {
 
 const Earnings = () => {
   const [pageNumber, setPageNumber] = useState(1)
+  const [search, setSearch] = useState<string>()
   const { data, error } = useSWR<CompaniesResp, Error>(
-    `/api/scores?page=${pageNumber}`,
+    `/api/scores?page=${pageNumber - 1}${search ? `&search=${search}` : ''}`,
     fetcher
   )
+  const [searchInput, setSearchInput] = useState<string>()
+
   const loading = !data && !error
 
   return (
@@ -39,7 +44,25 @@ const Earnings = () => {
           <Text h4>There was an error: {error.message}</Text>
         ) : (
           <Grid.Container justify="center" gap={2}>
-            <Grid>
+            <Grid xs={8}>
+              <Input
+                value={searchInput}
+                onChange={(e) => {
+                  setSearchInput(e.target.value)
+                }}
+                css={{ width: '100%' }}
+              />
+            </Grid>
+            <Grid xs={4}>
+              <Button
+                onClick={() => {
+                  setSearch(searchInput)
+                }}
+              >
+                Search
+              </Button>
+            </Grid>
+            <Grid xs={12} justify="center">
               <Pagination
                 total={data.pages}
                 page={pageNumber}
