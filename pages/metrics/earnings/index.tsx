@@ -33,7 +33,6 @@ const Earnings = () => {
   const { data, error } = useSWR<CompaniesResp, Error>(url, fetcher)
   const { value, reset, bindings } = useInput('')
 
-  console.log({ value })
   const loading = !data && !error
 
   const graphs = useMemo(() => {

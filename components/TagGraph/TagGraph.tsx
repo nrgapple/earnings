@@ -83,19 +83,30 @@ export const TagGraph = (props: TagGraphProps) => {
 const CustomTooltip = ({
   active,
   dot,
-}: TooltipProps<number, number> & { dot: DotProps }) => {
-  if (active && dot) {
+  payload,
+}: TooltipProps<string, number> & { dot: any }) => {
+  if (active && payload && payload.length && dot) {
     return (
-      <Card css={{ width: '12rem' }}>
+      <Card>
         <Grid.Container css={{ zIndex: 9999 }}>
           <Grid xs={12}>
-            <Text h5>{labelFormatter(dot['payload']['name'])}</Text>
+            <Text h5>{labelFormatter(payload[0].payload['name'])}</Text>
           </Grid>
-          <Grid xs={12}>
-            <Text color={dot['fill']}>{`${dot['dataKey']} : ${priceFormatter(
-              dot['value']
-            )}`}</Text>
-          </Grid>
+          {dot ? (
+            <Grid xs={12}>
+              <Text color={dot['fill']}>{`${dot['dataKey']} : ${priceFormatter(
+                dot['value']
+              )}`}</Text>
+            </Grid>
+          ) : (
+            payload.map((x) => (
+              <Grid xs={12} key={x.dataKey}>
+                <Text color={x.color}>
+                  {`${x.dataKey} : ${priceFormatter(x.value)}`}
+                </Text>
+              </Grid>
+            ))
+          )}
         </Grid.Container>
       </Card>
     )
