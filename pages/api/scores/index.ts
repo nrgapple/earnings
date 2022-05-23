@@ -3,13 +3,10 @@ import { Company, CompaniesResp, DBCompany } from '../../../interfaces'
 import prisma from '../../../lib/prisma'
 import { groupBy } from '../../../processor/utils'
 
-const count = 10
+const count = 5
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
-  //const redis = new Redis(process.env.REDIS_URL)
   try {
-    //const data = await redis.get('data')
     const { page, search } = _req.query
-    //const dataJson = JSON.parse(data)
     const companyCount = await prisma.company.count({
       ...(search
         ? {
@@ -21,7 +18,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
           }
         : {}),
     })
-    const numPages = Math.floor(companyCount / 10)
+    const numPages = Math.floor(companyCount / count)
     const p = page ? Number(page as string) : 0
     const cursor = p * count
     const endAmount =
@@ -68,8 +65,6 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     } as CompaniesResp)
   } catch (err: any) {
     res.status(500).json({ statusCode: 500, message: err.message })
-  } finally {
-    //redis.quit()
   }
 }
 

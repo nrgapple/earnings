@@ -94,6 +94,18 @@ const Earnings = () => {
               />
             </Grid>
             {graphs}
+            {data && data.companies?.length && (
+              <Grid xs={12} justify="center">
+                <Pagination
+                  total={data.pages}
+                  page={pageNumber}
+                  onChange={(p) => {
+                    console.log('here')
+                    setPageNumber(p)
+                  }}
+                />
+              </Grid>
+            )}
           </Grid.Container>
         )}
       </Grid.Container>
