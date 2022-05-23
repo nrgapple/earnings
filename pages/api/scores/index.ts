@@ -11,7 +11,17 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     //const data = await redis.get('data')
     const { page, search } = _req.query
     //const dataJson = JSON.parse(data)
-    const companyCount = await prisma.company.count({})
+    const companyCount = await prisma.company.count({
+      ...(search
+        ? {
+            where: {
+              ticker: {
+                search: search as string,
+              },
+            },
+          }
+        : {}),
+    })
     const numPages = Math.floor(companyCount / 10)
     const p = page ? Number(page as string) : 0
     const cursor = p * count
@@ -21,7 +31,9 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       ...(search
         ? {
             where: {
-              ticker: search as string,
+              ticker: {
+                search: search as string,
+              },
             },
           }
         : {}),
