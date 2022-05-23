@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   Container,
+  Divider,
   Grid,
   Input,
   Loading,
@@ -38,14 +39,15 @@ const Earnings = () => {
   const graphs = useMemo(() => {
     return data ? (
       data.companies.map((x) => (
-        <Grid key={x.ticker} xs={12}>
+        <Grid key={x.ticker}>
           <Card style={{ width: 'full' }}>
-            <Grid.Container gap={2}>
-              <Grid>
-                <Text h3>{x.ticker}</Text>
-              </Grid>
-              <Grid xs={12}>{<TagGraph tags={x.tags} />}</Grid>
-            </Grid.Container>
+            <Card.Header>
+              <Text h3>{x.ticker}</Text>
+            </Card.Header>
+            <Divider />
+            <Card.Body>
+              <TagGraph tags={x.tags} />
+            </Card.Body>
           </Card>
         </Grid>
       ))
@@ -55,35 +57,48 @@ const Earnings = () => {
   }, [data])
 
   return (
-    <Container fluid>
-      <Grid.Container gap={2} justify="center">
+    <Grid.Container gap={2} justify="center">
+      <Grid xs={12} justify="center">
+        <Text h1>Company Growths</Text>
+      </Grid>
+      <Grid xs={12} sm={6}>
+        <form
+          style={{ width: '100%' }}
+          onSubmit={(e) => {
+            e.preventDefault()
+            setSearch(value)
+          }}
+        >
+          <Input
+            css={{ width: '100%' }}
+            {...bindings}
+            onClearClick={reset}
+            label="Search"
+            type="search"
+          />
+        </form>
+      </Grid>
+      {loading ? (
         <Grid xs={12} justify="center">
-          <Text h1>Company Growths</Text>
+          <Loading type="points" />
         </Grid>
-        <Grid xs={12}>
-          <form
-            style={{ width: '100%' }}
-            onSubmit={(e) => {
-              e.preventDefault()
-              setSearch(value)
-            }}
-          >
-            <Input
-              css={{ width: '100%' }}
-              {...bindings}
-              onClearClick={reset}
-              label="Search"
-              type="search"
+      ) : error ? (
+        <Text h4>There was an error: {error.message}</Text>
+      ) : (
+        <Grid.Container justify="center" gap={2} direction="column">
+          <Grid xs justify="center">
+            <Pagination
+              total={data.pages}
+              page={pageNumber}
+              onChange={(p) => {
+                console.log('here')
+                setPageNumber(p)
+              }}
             />
-          </form>
-        </Grid>
-        {loading ? (
-          <Loading />
-        ) : error ? (
-          <Text h4>There was an error: {error.message}</Text>
-        ) : (
-          <Grid.Container justify="center" gap={2}>
-            <Grid xs={12} justify="center">
+          </Grid>
+          {graphs}
+          {data && data.companies?.length && (
+            <Grid xs justify="center">
               <Pagination
                 total={data.pages}
                 page={pageNumber}
@@ -93,23 +108,10 @@ const Earnings = () => {
                 }}
               />
             </Grid>
-            {graphs}
-            {data && data.companies?.length && (
-              <Grid xs={12} justify="center">
-                <Pagination
-                  total={data.pages}
-                  page={pageNumber}
-                  onChange={(p) => {
-                    console.log('here')
-                    setPageNumber(p)
-                  }}
-                />
-              </Grid>
-            )}
-          </Grid.Container>
-        )}
-      </Grid.Container>
-    </Container>
+          )}
+        </Grid.Container>
+      )}
+    </Grid.Container>
   )
 }
 

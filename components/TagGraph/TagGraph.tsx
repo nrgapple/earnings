@@ -27,10 +27,10 @@ export const TagGraph = (props: TagGraphProps) => {
   const [currDot, setCurrDot] = dot
 
   return (
-    <ResponsiveContainer width="100%" height={750} debounce={200}>
+    <ResponsiveContainer width="100%" height={600} debounce={200}>
       <LineChart
         data={data}
-        margin={{ top: 20, right: 5, bottom: 50, left: 20 }}
+        margin={{ top: 20, right: 5, bottom: 5, left: 20 }}
       >
         {Object.keys(tags).map((key) => (
           <Line
@@ -58,19 +58,9 @@ export const TagGraph = (props: TagGraphProps) => {
             <CustomTooltip {...props} dot={currDot} />
           )}
         />
-        <XAxis dataKey={'name'} tickFormatter={labelFormatter}>
-          <Label position="insideBottom" offset={-30}>
-            Year and Quarter
-          </Label>
-        </XAxis>
+        <XAxis dataKey={'name'} tickFormatter={labelFormatter}></XAxis>
         <YAxis
           scale={'sqrt'}
-          label={{
-            value: '$ / 100,000',
-            angle: -90,
-            position: 'insideLeft',
-            offset: -10,
-          }}
           //interval={0}
           tickFormatter={priceFormatter}
         />
