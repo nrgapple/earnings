@@ -9,7 +9,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   //const redis = new Redis(process.env.REDIS_URL)
   try {
     //const data = await redis.get('data')
-    const { page } = _req.query
+    const { page, search } = _req.query
     //const dataJson = JSON.parse(data)
     const companyCount = await prisma.company.count({})
     const numPages = Math.floor(companyCount / 10)
@@ -18,6 +18,13 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     const endAmount =
       companyCount - cursor < count ? companyCount - cursor : count
     const dbCompanies = (await prisma.company.findMany({
+      ...(search
+        ? {
+            where: {
+              ticker: search as string,
+            },
+          }
+        : {}),
       skip: cursor,
       take: endAmount,
       include: {
