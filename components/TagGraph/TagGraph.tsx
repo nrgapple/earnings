@@ -84,29 +84,25 @@ const CustomTooltip = ({
   active,
   dot,
   payload,
-}: TooltipProps<string, number> & { dot: any }) => {
-  if (active && payload && payload.length && dot) {
+}: TooltipProps<number, number> & { dot: any }) => {
+  if (active && dot) {
     return (
-      <Card>
-        <Grid.Container css={{ zIndex: 9999 }}>
-          <Grid xs={12}>
-            <Text h5>{labelFormatter(payload[0].payload['name'])}</Text>
+      <Card css={{ width: 'auto' }}>
+        <Grid.Container
+          direction="column"
+          css={{ zIndex: 9999, width: 'auto' }}
+        >
+          <Grid>
+            <Text h5>{labelFormatter(dot['payload']['name'])}</Text>
           </Grid>
-          {dot ? (
-            <Grid xs={12}>
-              <Text color={dot['fill']}>{`${dot['dataKey']} : ${priceFormatter(
-                dot['value']
-              )}`}</Text>
-            </Grid>
-          ) : (
-            payload.map((x) => (
-              <Grid xs={12} key={x.dataKey}>
-                <Text color={x.color}>
-                  {`${x.dataKey} : ${priceFormatter(x.value)}`}
-                </Text>
-              </Grid>
-            ))
-          )}
+          <Grid css={{ width: 'auto' }}>
+            <Text h5 color={dot['fill']}>
+              {dot['dataKey']}
+            </Text>
+          </Grid>
+          <Grid>
+            <Text>{priceFormatter(dot['value'])}</Text>
+          </Grid>
         </Grid.Container>
       </Card>
     )
