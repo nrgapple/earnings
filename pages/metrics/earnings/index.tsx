@@ -8,8 +8,9 @@ import {
   Loading,
   Pagination,
   Text,
+  useInput,
 } from '@nextui-org/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { TagGraph } from '../../../components/TagGraph'
 import { CompaniesResp } from '../../../interfaces'
 
@@ -24,13 +25,35 @@ const fetcher = async (...args) => {
 const Earnings = () => {
   const [pageNumber, setPageNumber] = useState(1)
   const [search, setSearch] = useState<string>()
-  const { data, error } = useSWR<CompaniesResp, Error>(
-    `/api/scores?page=${pageNumber - 1}${search ? `&search=${search}` : ''}`,
-    fetcher
+  const url = useMemo(
+    () =>
+      `/api/scores?page=${pageNumber - 1}${search ? `&search=${search}` : ''}`,
+    [search, pageNumber]
   )
-  const [searchInput, setSearchInput] = useState<string>()
+  const { data, error } = useSWR<CompaniesResp, Error>(url, fetcher)
+  const { value, reset, bindings } = useInput('')
 
+  console.log({ value })
   const loading = !data && !error
+
+  const graphs = useMemo(() => {
+    return data ? (
+      data.companies.map((x) => (
+        <Grid key={x.ticker} xs={12}>
+          <Card style={{ width: 'full' }}>
+            <Grid.Container gap={2}>
+              <Grid>
+                <Text h3>{x.ticker}</Text>
+              </Grid>
+              <Grid xs={12}>{<TagGraph tags={x.tags} />}</Grid>
+            </Grid.Container>
+          </Card>
+        </Grid>
+      ))
+    ) : (
+      <></>
+    )
+  }, [data])
 
   return (
     <Container fluid>
@@ -38,30 +61,29 @@ const Earnings = () => {
         <Grid xs={12} justify="center">
           <Text h1>Company Growths</Text>
         </Grid>
+        <Grid xs={12}>
+          <form
+            style={{ width: '100%' }}
+            onSubmit={(e) => {
+              e.preventDefault()
+              setSearch(value)
+            }}
+          >
+            <Input
+              css={{ width: '100%' }}
+              {...bindings}
+              onClearClick={reset}
+              label="Search"
+              type="search"
+            />
+          </form>
+        </Grid>
         {loading ? (
           <Loading />
         ) : error ? (
           <Text h4>There was an error: {error.message}</Text>
         ) : (
           <Grid.Container justify="center" gap={2}>
-            <Grid xs={8}>
-              <Input
-                value={searchInput}
-                onChange={(e) => {
-                  setSearchInput(e.target.value)
-                }}
-                css={{ width: '100%' }}
-              />
-            </Grid>
-            <Grid xs={4}>
-              <Button
-                onClick={() => {
-                  setSearch(searchInput)
-                }}
-              >
-                Search
-              </Button>
-            </Grid>
             <Grid xs={12} justify="center">
               <Pagination
                 total={data.pages}
@@ -72,18 +94,7 @@ const Earnings = () => {
                 }}
               />
             </Grid>
-            {data.companies.map((x) => (
-              <Grid key={x.ticker} xs={12}>
-                <Card style={{ width: 'full' }}>
-                  <Grid.Container gap={2}>
-                    <Grid>
-                      <Text h3>{x.ticker}</Text>
-                    </Grid>
-                    <Grid xs={12}>{<TagGraph tags={x.tags} />}</Grid>
-                  </Grid.Container>
-                </Card>
-              </Grid>
-            ))}
+            {graphs}
           </Grid.Container>
         )}
       </Grid.Container>
