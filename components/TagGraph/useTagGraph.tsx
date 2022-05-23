@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
 import { TagGraphProps } from './TagGraph'
 
-export const useTagGraph = ({ reports }: TagGraphProps) => {
+export const useTagGraph = ({ tags }: TagGraphProps) => {
   const dot = useState<any>()
   const data = useMemo(() => {
-    const allData = reports.flatMap(({ val, tag }) => {
+    const allData = tags.flatMap(({ name, reports }) => {
       return reports.map((x) => {
         return {
           name: new Date(x.end).getTime() / 1000,
-          [tag]: x.val,
+          [name]: x.val,
         }
       })
     })
@@ -27,6 +27,6 @@ export const useTagGraph = ({ reports }: TagGraphProps) => {
         return prev
       }, [])
       .sort((a, b) => a.name - b.name)
-  }, [reports])
+  }, [tags])
   return { data, dot } as const
 }

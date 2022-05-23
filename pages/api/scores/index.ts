@@ -22,7 +22,11 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       // skip: cursor,
       // take: endAmount,
       include: {
-        Report: true,
+        tags: {
+          include: {
+            reports: true,
+          },
+        },
       },
     })) as Company[]
 

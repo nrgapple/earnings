@@ -1,12 +1,16 @@
 export interface Company {
   ticker: string
   id: string
-  Report: Report[]
+  tags: Tag[]
 }
 
+export interface Tag {
+  name: string
+  id: string
+  reports: Report[]
+}
 export interface Report {
   id: string
-  tag: string
   val: number | undefined
   end: Date
   start: Date

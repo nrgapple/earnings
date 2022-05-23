@@ -56,7 +56,7 @@ const Earnings = () => {
                     <Grid>
                       <Text h3>{x.ticker}</Text>
                     </Grid>
-                    <Grid xs={12}>{<TagGraph reports={x} />}</Grid>
+                    <Grid xs={12}>{<TagGraph tags={x.tags} />}</Grid>
                   </Grid.Container>
                 </Card>
               </Grid>
