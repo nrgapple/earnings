@@ -1,20 +1,17 @@
 import { useMemo, useState } from 'react'
-import { DotProps } from 'recharts'
 import { TagGraphProps } from './TagGraph'
 
 export const useTagGraph = ({ reports }: TagGraphProps) => {
   const dot = useState<any>()
   const data = useMemo(() => {
-    const allData = Object.entries(reports.metrics).flatMap(
-      ([tag, reports]) => {
-        return reports.map((x) => {
-          return {
-            name: new Date(x.end).getTime() / 1000,
-            [tag]: x.val,
-          }
-        })
-      }
-    )
+    const allData = reports.flatMap(({ val, tag }) => {
+      return reports.map((x) => {
+        return {
+          name: new Date(x.end).getTime() / 1000,
+          [tag]: x.val,
+        }
+      })
+    })
 
     return allData
       .reduce((prev, curr) => {

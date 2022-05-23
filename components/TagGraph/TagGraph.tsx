@@ -11,14 +11,14 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { EarningsMetric } from '../../interfaces'
 import stringToColor from 'string-to-color'
 import { labelFormatter, priceFormatter } from '../../utils'
 import { useTagGraph } from './useTagGraph'
 import { Card, Grid, Text } from '@nextui-org/react'
+import { Company, Report } from '../../interfaces'
 
 export interface TagGraphProps {
-  reports: EarningsMetric
+  reports: Report[]
 }
 
 export const TagGraph = ({ reports }: TagGraphProps) => {
@@ -31,7 +31,7 @@ export const TagGraph = ({ reports }: TagGraphProps) => {
         data={data}
         margin={{ top: 20, right: 5, bottom: 50, left: 20 }}
       >
-        {Object.keys(reports.metrics).map((x) => (
+        {reports.map((x) => (
           <Line
             activeDot={{
               onMouseEnter(_, event) {
@@ -41,9 +41,9 @@ export const TagGraph = ({ reports }: TagGraphProps) => {
                 setCurrDot(undefined)
               },
             }}
-            key={x}
+            key={x.id}
             type="monotone"
-            dataKey={x}
+            dataKey={x.tag}
             stroke={stringToColor(x)}
             connectNulls
           />

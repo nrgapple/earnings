@@ -8,8 +8,8 @@ import {
   Text,
 } from '@nextui-org/react'
 import { useState } from 'react'
-import { EarningsResp } from '../../../interfaces'
 import { TagGraph } from '../../../components/TagGraph'
+import { CompaniesResp } from '../../../interfaces'
 
 // @ts-ignore
 const fetcher = async (...args) => {
@@ -21,7 +21,7 @@ const fetcher = async (...args) => {
 
 const Earnings = () => {
   const [pageNumber, setPageNumber] = useState(1)
-  const { data, error } = useSWR<EarningsResp, Error>(
+  const { data, error } = useSWR<CompaniesResp, Error>(
     `/api/scores?page=${pageNumber}`,
     fetcher
   )
@@ -49,7 +49,7 @@ const Earnings = () => {
                 }}
               />
             </Grid>
-            {data.earnings.map((x) => (
+            {data.companies.map((x) => (
               <Grid key={x.ticker} xs={12}>
                 <Card style={{ width: 'full' }}>
                   <Grid.Container gap={2}>

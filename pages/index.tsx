@@ -1,5 +1,4 @@
 import useSWR from 'swr'
-import { EarningsResp } from '../interfaces'
 import { Card, Container, Grid, Text } from '@nextui-org/react'
 import { useState } from 'react'
 import { Nav } from '../components/Nav'
@@ -13,15 +12,6 @@ const fetcher = async (...args) => {
 }
 
 const IndexPage = () => {
-  const [pageNumber, setPageNumber] = useState(1)
-  const { data, error } = useSWR<EarningsResp, Error>(
-    `/api/scores?page=${pageNumber}`,
-    fetcher
-  )
-  console.log({ pageNumber })
-
-  const loading = !data && !error
-
   return (
     <Container fluid>
       <Grid.Container gap={5} justify="center">
