@@ -8,11 +8,7 @@ import {
 } from './data/dataCache'
 import { cleanEarningsData } from './utils/process'
 import { Earnings, EarningsMetric, ReportResp, TickerInfo } from './types'
-import {
-  errorsCache,
-  getChunks,
-  getDomesticCompanies,
-} from './utils'
+import { errorsCache, getChunks, getDomesticCompanies } from './utils'
 import prisma from '../lib/prisma'
 require('dotenv').config()
 
@@ -36,10 +32,12 @@ const getCompaniesByChunk = async (companies: TickerInfo[]) => {
         }/companyfacts/CIK${`${company.cik_str}`.padStart(10, '0')}.json`
         if (hasCache(fileName)) {
           const data = (await getCachedEarnings(fileName)) as ReportResp
-          return {
-            ticker: company.ticker,
-            tags: data.facts['us-gaap'],
-          } as Earnings
+          if (data.facts) {
+            return {
+              ticker: company.ticker,
+              tags: data.facts['us-gaap'],
+            } as Earnings
+          }
         }
         return undefined
       })
