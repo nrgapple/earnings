@@ -12,8 +12,6 @@ import {
   errorsCache,
   getChunks,
   getDomesticCompanies,
-  timeout,
-  unique,
 } from './utils'
 import prisma from '../lib/prisma'
 require('dotenv').config()
@@ -72,7 +70,7 @@ const uploadToPrisma = async (company: EarningsMetric) => {
 }
 
 const getEarningsFromZip = async (companies: TickerInfo[]) => {
-  const companyChunks = getChunks(companies, 100) as TickerInfo[][]
+  const companyChunks = getChunks(companies, 20) as TickerInfo[][]
   let i = 0
   for await (const companyChunk of companyChunks) {
     i++
@@ -85,10 +83,12 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
     const earnings = await getCompaniesByChunk(companyChunk)
     const domesticEarnings = getDomesticCompanies(earnings)
     const companiesCleaned = cleanEarningsData(domesticEarnings)
+    await prisma.report.deleteMany({})
     console.log(`loading chunk: ${i}, length: ${companiesCleaned.length}`)
     for await (const cleaned of companiesCleaned) {
       await uploadToPrisma(cleaned)
     }
+    break
   }
 }
 

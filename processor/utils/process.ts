@@ -11,9 +11,8 @@ import {
   sumFunc,
   sortReports,
   objArrToObj,
-  unique,
   getQuarterFromEndDate,
-  addQ4IfMissing,
+  addMissingQ,
   groupBy,
 } from './utils'
 
@@ -62,19 +61,23 @@ const cleanCompanyEarnings = (earning: Earnings) => {
     metrics: Object.entries(parsedMetrics.metrics)
       .filter((x) => x[1])
       .reduce((record, [tag, reports]) => {
-        const uniqueSortedReports = unique<ReportPretty>(
-          sortReports(reports, 'end'),
-          (report) => report.end
-        ).map((x) => ({
-          start: x.start,
-          end: x.end,
-          val: x.val,
-          fp: getQuarterFromEndDate(x).fp,
-          fy: getQuarterFromEndDate(x).fy,
-        }))
+        const uniqueSortedReports = sortReports(reports, 'end')
+          .map((x) => {
+            const quarterAndYear = getQuarterFromEndDate(x)
+            return quarterAndYear
+              ? ({
+                  start: x.start,
+                  end: x.end,
+                  val: x.val,
+                  fp: quarterAndYear.fp,
+                  fy: quarterAndYear.fy,
+                } as ReportPretty)
+              : undefined
+          })
+          .filter((x) => x) as ReportPretty[]
         record[tag] = Object.values(
           groupBy(
-            addQ4IfMissing(uniqueSortedReports).filter((x) => x.fp !== 'FY'),
+            addMissingQ(uniqueSortedReports).filter((x) => x.fp !== 'FY'),
             (report) => report.fy + report.fp
           )
         ).flatMap((values) => {

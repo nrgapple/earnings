@@ -6,19 +6,11 @@ import {
   ReportPretty,
   TagData,
   TagsKey,
-  TagsObject,
 } from '../types'
-//@ts-ignore
 
 export const errorsCache = [] as unknown[]
 
 export const growthValues = [] as unknown[]
-
-export const unique = <T extends unknown>(arr: T[], func: (v: T) => string) => {
-  const result = new Map<string, T>()
-  arr.forEach((x) => result.set(func(x), x))
-  return [...result.values()]
-}
 
 export const groupBy = <T>(arr: T[], func: (v: T) => string) => {
   return arr.reduce((prev, curr) => {
@@ -194,59 +186,149 @@ function monthDiff(d1: Date, d2: Date) {
   return months <= 0 ? 0 : months
 }
 
+export const getQfromMonth = (endMonth: number) => {
+  if (endMonth > 2 && endMonth < 5) {
+    return 'Q1'
+  } else if (endMonth > 5 && endMonth < 8) {
+    return 'Q2'
+  } else if (endMonth > 8 && endMonth < 11) {
+    return 'Q3'
+  } else {
+    return 'Q4'
+  }
+}
+
 export const getQuarterFromEndDate = (report: ReportPretty) => {
   const endMonth = Number(report.end.split('-')[1])
   const endYear = Number(report.end.split('-')[0])
   let fp
   let fy = endYear
-  if (endMonth > 2 && endMonth < 5) {
-    fp = 'Q1'
-  } else if (endMonth > 5 && endMonth < 8) {
-    fp = 'Q2'
-  } else if (endMonth > 8 && endMonth < 11) {
-    fp = 'Q3'
-  } else {
-    const monthsBetween = report.start
-      ? monthDiff(new Date(report.start), new Date(report.end))
-      : undefined
-    if (monthsBetween && monthsBetween > 6) {
-      fp = 'FY'
-    } else {
-      fp = 'Q4'
-    }
-    if (endMonth === 1) {
-      fy = fy - 1
-    }
+  const monthsBetween = report.start
+    ? monthDiff(new Date(report.start), new Date(report.end))
+    : undefined
+
+  if (monthsBetween && monthsBetween > 4 && monthsBetween < 10) {
+    return undefined
   }
+  const isFy = monthsBetween && monthsBetween > 9
+  fp = getQfromMonth(endMonth)
   return {
-    fp,
-    fy,
+    fp: isFy ? 'FY' : fp,
+    fy: endMonth === 1 ? fy - 1 : fy,
   }
 }
 
-export const addQ4IfMissing = (reports: ReportPretty[]) => {
+export const getFiscalYearQs = (
+  year: number,
+  missingQ: 'Q1' | 'Q2' | 'Q3' | 'Q4'
+) => {
+  let fp
+  let fy
+  switch (missingQ) {
+    case 'Q1':
+      return [
+        {
+          fp: 'Q4',
+          fy: year - 1,
+        },
+        {
+          fp: 'Q3',
+          fy: year - 1,
+        },
+        {
+          fp: 'Q2',
+          fy: year - 1,
+        },
+      ]
+    case 'Q2':
+      return [
+        {
+          fp: 'Q1',
+          fy: year,
+        },
+        {
+          fp: 'Q4',
+          fy: year - 1,
+        },
+        {
+          fp: 'Q3',
+          fy: year - 1,
+        },
+      ]
+    case 'Q3':
+      return [
+        {
+          fp: 'Q2',
+          fy: year,
+        },
+        {
+          fp: 'Q1',
+          fy: year,
+        },
+        {
+          fp: 'Q4',
+          fy: year - 1,
+        },
+      ]
+    case 'Q4':
+      return [
+        {
+          fp: 'Q3',
+          fy: year,
+        },
+        {
+          fp: 'Q2',
+          fy: year,
+        },
+        {
+          fp: 'Q1',
+          fy: year,
+        },
+      ]
+    default:
+      break
+  }
+}
+
+export const addMissingQ = (reports: ReportPretty[]) => {
   const reportsWithQ4 = reports.reduce(
     (values, currReport) => {
       if (currReport.fp === 'FY') {
-        const allQuarterReportsForYear = reports.filter(
-          (x) => x.fy === currReport.fy && x.fp !== 'FY'
-        )
-        if (allQuarterReportsForYear.length === 3) {
-          const firstThreeQuarterRevs = allQuarterReportsForYear.reduce(
-            (totalRevs, rep) => {
-              totalRevs += rep.val ?? 0
-              return totalRevs
-            },
-            0
+        const endDateSplit = currReport.end.split('-')
+        const year = Number(endDateSplit[0])
+        const month = Number(endDateSplit[1])
+        const missingQ = getQfromMonth(month)
+        const otherRep = reports.find((x) => x.fy == year && x.fp === missingQ)
+        if (!otherRep) {
+          const matchingQs = getFiscalYearQs(year, missingQ)
+
+          const allQuarterReportsForYear = reports.filter(
+            (x) =>
+              !!matchingQs?.find(
+                (match) => x.fp === match.fp && x.fy === match.fy
+              )
           )
-          values.result.push({
-            ...currReport,
-            start: allQuarterReportsForYear[2].end,
-            val: currReport.val
-              ? currReport.val - firstThreeQuarterRevs
-              : undefined,
-            fp: 'Q4',
-          })
+          const uniqueMatches = unique2(
+            allQuarterReportsForYear,
+            (report) => report.fp + report.fy
+          )
+          if (uniqueMatches.length === 3) {
+            const firstThreeQuarterRevs = uniqueMatches.reduce(
+              (totalRevs, rep) => {
+                totalRevs += rep.val ?? 0
+                return totalRevs
+              },
+              0
+            )
+            values.result.push({
+              ...currReport,
+              start: uniqueMatches[2].end,
+              val: currReport.val
+                ? currReport.val - firstThreeQuarterRevs
+                : undefined,
+              fp: missingQ,
+            })
+          }
         }
       }
       values.result.push({
