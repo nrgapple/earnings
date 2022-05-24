@@ -61,7 +61,7 @@ const cleanCompanyEarnings = (earning: Earnings) => {
     metrics: Object.entries(parsedMetrics.metrics)
       .filter((x) => x[1])
       .reduce((record, [tag, reports]) => {
-        const uniqueSortedReports = sortReports(reports, 'end')
+        const sortedReports = sortReports(reports, 'end')
           .map((x) => {
             const quarterAndYear = getQuarterFromEndDate(x)
             return quarterAndYear
@@ -77,7 +77,7 @@ const cleanCompanyEarnings = (earning: Earnings) => {
           .filter((x) => x) as ReportPretty[]
         record[tag] = Object.values(
           groupBy(
-            addMissingQ(uniqueSortedReports).filter((x) => x.fp !== 'FY'),
+            addMissingQ(sortedReports).filter((x) => x.fp !== 'FY'),
             (report) => report.fy + report.fp
           )
         ).flatMap((values) => {

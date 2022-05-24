@@ -22,7 +22,7 @@ export const groupBy = <T>(arr: T[], func: (v: T) => string) => {
   }, {} as Record<string, T[]>)
 }
 
-export const unique2 = <T extends unknown>(
+export const unique = <T extends unknown>(
   arr: T[],
   func: (v: T) => string
 ) => {
@@ -298,18 +298,20 @@ export const addMissingQ = (reports: ReportPretty[]) => {
         const year = Number(endDateSplit[0])
         const month = Number(endDateSplit[1])
         const missingQ = getQfromMonth(month)
-        const otherRep = reports.find((x) => x.fy == year && x.fp === missingQ)
-        if (!otherRep) {
+        const existingReport = reports.find(
+          (x) => x.fy == year && x.fp === missingQ
+        )
+        if (!existingReport) {
           const matchingQs = getFiscalYearQs(year, missingQ)
 
-          const allQuarterReportsForYear = reports.filter(
+          const allQuarterReportsForFiscalYear = reports.filter(
             (x) =>
               !!matchingQs?.find(
                 (match) => x.fp === match.fp && x.fy === match.fy
               )
           )
-          const uniqueMatches = unique2(
-            allQuarterReportsForYear,
+          const uniqueMatches = unique(
+            allQuarterReportsForFiscalYear,
             (report) => report.fp + report.fy
           )
           if (uniqueMatches.length === 3) {
