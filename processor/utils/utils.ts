@@ -22,10 +22,7 @@ export const groupBy = <T>(arr: T[], func: (v: T) => string) => {
   }, {} as Record<string, T[]>)
 }
 
-export const unique = <T extends unknown>(
-  arr: T[],
-  func: (v: T) => string
-) => {
+export const unique = <T extends unknown>(arr: T[], func: (v: T) => string) => {
   const result = new Map<string, T>()
   arr.forEach((x) => result.set(func(x), x))
   return [...result.values()]
@@ -295,11 +292,12 @@ export const addMissingQ = (reports: ReportPretty[]) => {
     (values, currReport) => {
       if (currReport.fp === 'FY') {
         const endDateSplit = currReport.end.split('-')
-        const year = Number(endDateSplit[0])
         const month = Number(endDateSplit[1])
+        let year = Number(endDateSplit[0])
+        year = month === 1 ? year - 1 : year
         const missingQ = getQfromMonth(month)
         const existingReport = reports.find(
-          (x) => x.fy == year && x.fp === missingQ
+          (x) => x.fy === year && x.fp === missingQ
         )
         if (!existingReport) {
           const matchingQs = getFiscalYearQs(year, missingQ)
