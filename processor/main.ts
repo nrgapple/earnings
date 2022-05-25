@@ -80,6 +80,16 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
     })
     const earnings = await getCompaniesByChunk(companyChunk)
     const domesticEarnings = getDomesticCompanies(earnings)
+    // Object.entries(
+    //   domesticEarnings.find((x) => x.ticker === 'JNJ')?.tags!
+    // ).forEach(([tag, data]) => {
+    //   console.log(tag)
+    //   if (data.units.USD) {
+    //     data.units.USD.forEach((x) => {
+    //       console.log(x)
+    //     })
+    //   }
+    // })
     const companiesCleaned = cleanEarningsData(domesticEarnings)
     await prisma.report.deleteMany({})
     console.log(`loading chunk: ${i}, length: ${companiesCleaned.length}`)

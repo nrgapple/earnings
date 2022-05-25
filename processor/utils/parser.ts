@@ -312,25 +312,24 @@ export const load = (earning: EarningsMetric) => {
   }
 
   // Revenues
-  tags['Revenues'] = earning.metrics['Revenues']
-    ? earning.metrics['Revenues']
-    : [
-        ...(earning.metrics['SalesRevenueNet'] ?? []),
-        ...(earning.metrics['SalesRevenueServicesNet'] ?? []),
-        ...(earning.metrics['RevenuesNetOfInterestExpense'] ?? []),
-        ...(earning.metrics['RegulatedAndUnregulatedOperatingRevenue'] ?? []),
-        ...(earning.metrics['HealthCareOrganizationRevenue'] ?? []),
-        ...(earning.metrics['InterestAndDividendIncomeOperating'] ?? []),
-        ...(earning.metrics['RealEstateRevenueNet'] ?? []),
-        ...(earning.metrics['RevenueMineralSales'] ?? []),
-        ...(earning.metrics['OilAndGasRevenue'] ?? []),
-        ...(earning.metrics['FinancialServicesRevenue'] ?? []),
-        ...(earning.metrics['RegulatedAndUnregulatedOperatingRevenue'] ?? []),
-        ...(earning.metrics[
-          'RevenueFromContractWithCustomerExcludingAssessedTax'
-        ] ?? []),
-        ...(earning.metrics['SalesRevenueGoodsNet'] ?? []),
-      ]
+  tags['Revenues'] = [
+    ...(earning.metrics['SalesRevenueNet'] ?? []),
+    ...(earning.metrics['SalesRevenueGoodsNet'] ?? []),
+    ...(earning.metrics['SalesRevenueServicesNet'] ?? []),
+    ...(earning.metrics['RevenuesNetOfInterestExpense'] ?? []),
+    ...(earning.metrics['RegulatedAndUnregulatedOperatingRevenue'] ?? []),
+    ...(earning.metrics['HealthCareOrganizationRevenue'] ?? []),
+    ...(earning.metrics['InterestAndDividendIncomeOperating'] ?? []),
+    ...(earning.metrics['RealEstateRevenueNet'] ?? []),
+    ...(earning.metrics['RevenueMineralSales'] ?? []),
+    ...(earning.metrics['OilAndGasRevenue'] ?? []),
+    ...(earning.metrics['FinancialServicesRevenue'] ?? []),
+    ...(earning.metrics['RegulatedAndUnregulatedOperatingRevenue'] ?? []),
+    ...(earning.metrics[
+      'RevenueFromContractWithCustomerExcludingAssessedTax'
+    ] ?? []),
+    ...(earning.metrics['Revenues'] ?? []),
+  ]
 
   // CostOfRevenue
   tags['CostOfRevenue'] = [
