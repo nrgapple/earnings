@@ -81,7 +81,7 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
     const earnings = await getCompaniesByChunk(companyChunk)
     const domesticEarnings = getDomesticCompanies(earnings)
     // Object.entries(
-    //   domesticEarnings.find((x) => x.ticker === 'JNJ')?.tags!
+    //   domesticEarnings.find((x) => x.ticker === 'UNH')?.tags!
     // ).forEach(([tag, data]) => {
     //   console.log(tag)
     //   if (data.units.USD) {

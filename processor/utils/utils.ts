@@ -12,9 +12,12 @@ export const errorsCache = [] as unknown[]
 
 export const growthValues = [] as unknown[]
 
-export const groupBy = <T>(arr: T[], func: (v: T) => string) => {
+export const groupBy = <T>(arr: T[], func: (v: T) => string | undefined) => {
   return arr.reduce((prev, curr) => {
     const key = func(curr)
+    if (!key) {
+      return prev
+    }
     return {
       ...prev,
       [key]: [...(prev[key] ?? []), curr],
@@ -175,15 +178,7 @@ export const objArrToObj = <T extends string, TV extends unknown>(
 //   }
 // }
 
-function monthDiff(d1: Date, d2: Date) {
-  var months
-  months = (d2.getFullYear() - d1.getFullYear()) * 12
-  months -= d1.getMonth()
-  months += d2.getMonth()
-  return months <= 0 ? 0 : months
-}
-
-export const getQfromMonth = (endMonth: number) => {
+export const getQuarterFromMonth = (endMonth: number) => {
   if (endMonth > 2 && endMonth < 5) {
     return 'Q1'
   } else if (endMonth > 5 && endMonth < 8) {
@@ -192,26 +187,6 @@ export const getQfromMonth = (endMonth: number) => {
     return 'Q3'
   } else {
     return 'Q4'
-  }
-}
-
-export const getQuarterFromEndDate = (report: ReportPretty) => {
-  const endMonth = Number(report.end.split('-')[1])
-  const endYear = Number(report.end.split('-')[0])
-  let fp
-  let fy = endYear
-  const monthsBetween = report.start
-    ? monthDiff(new Date(report.start), new Date(report.end))
-    : undefined
-
-  if (monthsBetween && monthsBetween > 4 && monthsBetween < 10) {
-    return undefined
-  }
-  const isFy = monthsBetween && monthsBetween > 9
-  fp = getQfromMonth(endMonth)
-  return {
-    fp: isFy ? 'FY' : fp,
-    fy: endMonth === 1 ? fy - 1 : fy,
   }
 }
 
@@ -287,33 +262,42 @@ export const getFiscalYearQs = (
   }
 }
 
-export const addMissingQ = (reports: ReportPretty[]) => {
-  const reportsWithQ4 = reports.reduce(
+export const setQuarterFromFrame = (report: ReportPretty) => {
+  const frame = report.frame?.replace('CY', '')
+  const splitFrame = frame!.split('Q')
+  const fp = splitFrame?.length === 2 ? `Q${splitFrame[1]}` : 'FY'
+  const fy = Number(splitFrame[0])
+  return {
+    ...report,
+    fp,
+    fy,
+  } as ReportPretty
+}
+
+export const checkAndAddMissingQuarter = (reports: ReportPretty[]) => {
+  const reportsWithMissingQuarter = reports.reduce(
     (values, currReport) => {
       if (currReport.fp === 'FY') {
         const endDateSplit = currReport.end.split('-')
         const month = Number(endDateSplit[1])
-        let year = Number(endDateSplit[0])
-        year = month === 1 ? year - 1 : year
-        const missingQ = getQfromMonth(month)
+        const missingQuarter = getQuarterFromMonth(month)
         const existingReport = reports.find(
-          (x) => x.fy === year && x.fp === missingQ
+          (x) => x.fy === currReport.fy && x.fp === missingQuarter
         )
         if (!existingReport) {
-          const matchingQs = getFiscalYearQs(year, missingQ)
+          const matchingQuarters = getFiscalYearQs(
+            currReport.fy,
+            missingQuarter
+          )
 
           const allQuarterReportsForFiscalYear = reports.filter(
             (x) =>
-              !!matchingQs?.find(
+              !!matchingQuarters?.find(
                 (match) => x.fp === match.fp && x.fy === match.fy
               )
           )
-          const uniqueMatches = unique(
-            allQuarterReportsForFiscalYear,
-            (report) => report.fp + report.fy
-          )
-          if (uniqueMatches.length === 3) {
-            const firstThreeQuarterRevs = uniqueMatches.reduce(
+          if (allQuarterReportsForFiscalYear.length === 3) {
+            const firstThreeQuarterRevs = allQuarterReportsForFiscalYear.reduce(
               (totalRevs, rep) => {
                 totalRevs += rep.val ?? 0
                 return totalRevs
@@ -322,21 +306,22 @@ export const addMissingQ = (reports: ReportPretty[]) => {
             )
             values.result.push({
               ...currReport,
-              start: uniqueMatches[2].end,
+              start: allQuarterReportsForFiscalYear[2].end,
               val: currReport.val
                 ? currReport.val - firstThreeQuarterRevs
                 : undefined,
-              fp: missingQ,
+              fp: missingQuarter,
             })
           }
         }
+      } else {
+        values.result.push({
+          ...currReport,
+        })
       }
-      values.result.push({
-        ...currReport,
-      })
       return values
     },
     { result: [] as ReportPretty[] }
   )
-  return reportsWithQ4.result
+  return reportsWithMissingQuarter.result
 }

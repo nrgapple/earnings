@@ -56,6 +56,7 @@ export interface ReportPretty {
   start?: string
   end: string
   filed?: string
+  frame?: string
 }
 
 export interface CompanyProfile {

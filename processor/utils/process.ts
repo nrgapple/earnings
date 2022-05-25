@@ -9,11 +9,10 @@ import {
 import { load } from './parser'
 import {
   sumFunc,
-  sortReports,
   objArrToObj,
-  getQuarterFromEndDate,
-  addMissingQ,
   groupBy,
+  setQuarterFromFrame,
+  checkAndAddMissingQuarter,
 } from './utils'
 
 // export const normalizeValues = (earnings: EarningsMetric[]) => {
@@ -54,37 +53,18 @@ const cleanCompanyEarnings = (earning: Earnings) => {
         } as EarningMap)
     )
     .filter((x) => x.value)
-  const earningMap2 = objArrToObj<string, ReportPretty[]>(earningMapArr)
-  const parsedMetrics = load({ ticker: earning.ticker, metrics: earningMap2 })
+  const earningMap = objArrToObj<string, ReportPretty[]>(earningMapArr)
+  const parsedMetrics = load({ ticker: earning.ticker, metrics: earningMap })
   return {
     ...parsedMetrics,
     metrics: Object.entries(parsedMetrics.metrics)
-      .filter((x) => x[1])
+      .filter((x) => x[1] && x[1].length > 0)
       .reduce((record, [tag, reports]) => {
-        const sortedReports = sortReports(reports, 'end')
-          .map((x) => {
-            const quarterAndYear = getQuarterFromEndDate(x)
-            return quarterAndYear
-              ? ({
-                  start: x.start,
-                  end: x.end,
-                  val: x.val,
-                  fp: quarterAndYear.fp,
-                  fy: quarterAndYear.fy,
-                } as ReportPretty)
-              : undefined
-          })
-          .filter((x) => x) as ReportPretty[]
-        record[tag] = Object.values(
-          groupBy(
-            addMissingQ(sortedReports).filter((x) => x.fp !== 'FY'),
-            (report) => report.fy + report.fp
-          )
-        ).flatMap((values) => {
-          return [...values].sort((a, b) =>
-            new Date(a.end).getTime() > new Date(b.end).getTime() ? -1 : 1
-          )[0]
-        })
+        const reportsByFrame = groupBy(reports, (report) => report.frame)
+        const allReports = Object.values(reportsByFrame).flatMap((reports) =>
+          setQuarterFromFrame(reports[0])
+        )
+        record[tag] = checkAndAddMissingQuarter(allReports)
         return record
       }, {} as Record<string, ReportPretty[]>),
   } as EarningsMetric
