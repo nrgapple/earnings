@@ -27,12 +27,27 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       ...(search
         ? {
             where: {
-              ticker: {
-                search: search as string,
-              },
+              AND: [
+                { ticker: search as string },
+                {
+                  reports: {
+                    some: {},
+                  },
+                },
+              ],
             },
           }
-        : {}),
+        : {
+            where: {
+              AND: [
+                {
+                  reports: {
+                    some: {},
+                  },
+                },
+              ],
+            },
+          }),
       skip: cursor,
       take: endAmount,
       include: {
@@ -48,6 +63,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       (c) =>
         ({
           ...c,
+          ticker: c.ticker,
           tags: groupBy(c.reports, (v) => v.tag),
         } as Company)
     )
