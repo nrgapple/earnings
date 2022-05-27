@@ -1,17 +1,10 @@
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { createSwaggerSpec } from 'next-swagger-doc'
-import dynamic from 'next/dynamic'
-import { ComponentType } from 'react'
-import { SwaggerUIProps } from 'swagger-ui-react'
-import 'swagger-ui-react/swagger-ui.css'
 
-const SwaggerUI = dynamic(import('swagger-ui-react'), {
-  ssr: false,
-}) as ComponentType<SwaggerUIProps>
+import { RedocStandalone } from 'redoc'
 
 const ApiDoc = ({ spec }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  //@ts-ignore
-  return <SwaggerUI spec={spec} />
+  return <RedocStandalone spec={spec} />
 }
 
 export const getStaticProps: GetStaticProps = async () => {
