@@ -11,6 +11,8 @@ declare global {
       REDIS_PW: string
       REDIS_URL: string
       ENV: 'test' | 'dev' | 'prod'
+      GITHUB_CLIENT_SECRET: string
+      GITHUB_CLIENT_ID: string
     }
   }
 }

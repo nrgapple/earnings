@@ -1,7 +1,10 @@
 import { Grid, Link, Text } from '@nextui-org/react'
 import NextLink from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export const Nav = () => {
+  const session = useSession()
+
   return (
     <Grid.Container>
       <Grid xs={12}>
@@ -11,6 +14,13 @@ export const Nav = () => {
           </Grid>
 
           <Grid xs={3}>
+            <Text>
+              <NextLink href="/api/auth/signin">
+                <Link block color="secondary">
+                  Sign in
+                </Link>
+              </NextLink>
+            </Text>
             <Text>
               <NextLink href="/">
                 <Link block color="secondary">
@@ -23,6 +33,7 @@ export const Nav = () => {
                 Earnings
               </Link>
             </NextLink>
+            <Text>Welcome, {session.data?.user.name}</Text>
           </Grid>
         </Grid.Container>
       </Grid>
