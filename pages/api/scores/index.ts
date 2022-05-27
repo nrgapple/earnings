@@ -4,6 +4,16 @@ import prisma from '../../../lib/prisma'
 import { groupBy } from '../../../processor/utils'
 
 const count = 5
+
+/**
+ * @swagger
+ * /api/scores:
+ *   get:
+ *     description: Returns company earnings
+ *     responses:
+ *       200:
+ *         description: hello world
+ */
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { page, search } = _req.query
