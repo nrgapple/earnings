@@ -33,11 +33,12 @@ export const Searchbar = () => {
         type={'search'}
         placeholder="Search ticker"
         onClearClick={reset}
+        underlined
       />
       {searchResults.length > 0 && (
         <Card>
           {searchResults.map((result, i) => (
-            <Row key={i}>
+            <Row key={`search-dropdown-${result.ticker}`}>
               <NextLink
                 href={`/metrics/earnings?ticker=${result.ticker}`}
                 passHref

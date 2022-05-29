@@ -1,3 +1,5 @@
+import { CompanyMetrics } from '../constants'
+
 export interface Company {
   ticker: string
   id: string
@@ -12,12 +14,14 @@ export interface DBCompany {
 
 export interface Report {
   id: string
-  val: number | undefined
-  end: Date
-  start: Date
-  fp: string
+  val?: number
+  form: string
   fy: number
-  tag: string
+  fp: string
+  start: string
+  end: string
+  filed: string
+  frame: string
 }
 
 export interface CompanyProfile {
@@ -55,3 +59,5 @@ export interface CompaniesResp {
 export interface SearchResult {
   ticker: string
 }
+
+export type MetricType = keyof typeof CompanyMetrics

@@ -1,13 +1,14 @@
 import { Grid, Link, Text } from '@nextui-org/react'
 import NextLink from 'next/link'
-import { Searchbar } from './Searchbar'
+import { Searchbar } from '../Searchbar'
 
 export const Nav = () => {
   return (
     <Grid.Container
       justify="space-between"
+      alignItems="center"
       css={{
-        p: '$4',
+        p: '$6',
       }}
     >
       <Grid xs={5}>

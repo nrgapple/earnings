@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import Head from 'next/head'
-import { Nav } from './Nav'
+import { Nav } from '../Nav'
 
 type Props = {
   children?: ReactNode
