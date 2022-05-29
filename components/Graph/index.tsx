@@ -75,7 +75,7 @@ export const Graph = ({ companies }: Props) => {
                 onChange={setSelectedTags}
                 options={Object.keys(company.tags).map((tag) => ({
                   value: tag,
-                  label: tag,
+                  label: tag.split(/(?=[A-Z])/).join(' '),
                 }))}
               />
               <TagGraph tags={filteredTags(company)} />
