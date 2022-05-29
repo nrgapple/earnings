@@ -20,9 +20,9 @@ export const Nav = () => {
             Home
           </Link>
         </NextLink>
-        <NextLink href="/metrics/earnings">
+        <NextLink href="/documentations">
           <Link block color="secondary">
-            Earnings
+            API
           </Link>
         </NextLink>
       </Grid>

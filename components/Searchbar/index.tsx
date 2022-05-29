@@ -39,10 +39,7 @@ export const Searchbar = () => {
         <Card>
           {searchResults.map((result, i) => (
             <Row key={`search-dropdown-${result.ticker}`}>
-              <NextLink
-                href={`/metrics/earnings?ticker=${result.ticker}`}
-                passHref
-              >
+              <NextLink href={`?ticker=${result.ticker}`} passHref>
                 <Link>{result.ticker}</Link>
               </NextLink>
             </Row>
