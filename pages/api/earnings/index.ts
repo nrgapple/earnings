@@ -7,7 +7,7 @@ const count = 5
 
 /**
  * @swagger
- * /api/scores:
+ * /api/earnings:
  *   get:
  *     description: Returns company earnings
  *     responses:
@@ -21,9 +21,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       ...(search
         ? {
             where: {
-              ticker: {
-                search: search as string,
-              },
+              ticker: (search as string).toUpperCase(),
             },
           }
         : {}),
@@ -38,7 +36,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
         ? {
             where: {
               AND: [
-                { ticker: search as string },
+                { ticker: (search as string).toUpperCase() },
                 {
                   reports: {
                     some: {},

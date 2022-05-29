@@ -1,30 +1,32 @@
 import { Grid, Link, Text } from '@nextui-org/react'
 import NextLink from 'next/link'
+import { Searchbar } from './Searchbar'
 
 export const Nav = () => {
   return (
-    <Grid.Container>
-      <Grid xs={12}>
-        <Grid.Container justify="space-between" alignItems="center">
-          <Grid xs={3}>
-            <Text h2>Tross Capital</Text>
-          </Grid>
-
-          <Grid xs={3}>
-            <Text>
-              <NextLink href="/">
-                <Link block color="secondary">
-                  Home
-                </Link>
-              </NextLink>
-            </Text>
-            <NextLink href="/metrics/earnings">
-              <Link block color="secondary">
-                Earnings
-              </Link>
-            </NextLink>
-          </Grid>
-        </Grid.Container>
+    <Grid.Container
+      justify="space-between"
+      css={{
+        p: '$4',
+      }}
+    >
+      <Grid xs={5}>
+        <Text css={{ pr: '$5' }} h4>
+          Tross Capital
+        </Text>
+        <NextLink href="/">
+          <Link block color="secondary">
+            Home
+          </Link>
+        </NextLink>
+        <NextLink href="/metrics/earnings">
+          <Link block color="secondary">
+            Earnings
+          </Link>
+        </NextLink>
+      </Grid>
+      <Grid xs={4}>
+        <Searchbar />
       </Grid>
     </Grid.Container>
   )

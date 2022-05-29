@@ -51,3 +51,7 @@ export interface CompaniesResp {
   pages: number
   current: number
 }
+
+export interface SearchResult {
+  ticker: string
+}
