@@ -57,6 +57,8 @@ export interface ReportPretty {
   end: string
   filed?: string
   frame?: string
+  accn?: string
+  endMonths?: number
 }
 
 export interface CompanyProfile {

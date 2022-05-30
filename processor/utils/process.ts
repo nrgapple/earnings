@@ -11,8 +11,9 @@ import {
   sumFunc,
   objArrToObj,
   groupBy,
-  setQuarterFromFrame,
-  checkAndAddMissingQuarter,
+  sortReports,
+  calculateYtdToQuarter,
+  getMonthsEnd,
 } from './utils'
 
 // export const normalizeValues = (earnings: EarningsMetric[]) => {
@@ -60,11 +61,34 @@ const cleanCompanyEarnings = (earning: Earnings) => {
     metrics: Object.entries(parsedMetrics.metrics)
       .filter((x) => x[1] && x[1].length > 0)
       .reduce((record, [tag, reports]) => {
-        const reportsByFrame = groupBy(reports, (report) => report.frame)
-        const allReports = Object.values(reportsByFrame).flatMap((reports) =>
-          setQuarterFromFrame(reports[0])
+        // group all reports by the account number
+        const allYTDReports = reports
+          .map((report) => ({
+            ...report,
+            endMonths:
+              Math.round(getMonthsEnd(report.end, report.start) ?? 0) ||
+              undefined,
+          }))
+          .filter(
+            (report) =>
+              report.endMonths === undefined ||
+              report.endMonths === 3 ||
+              report.endMonths === 12
+          )
+        const reportsByFiled = groupBy(allYTDReports, (report) => report.filed)
+        const reportsForFilingPeriod = sortReports(
+          Object.values(reportsByFiled).flatMap(
+            (reports) => sortReports(reports, 'end')[reports.length - 1]
+          ),
+          'end'
         )
-        record[tag] = checkAndAddMissingQuarter(allReports)
+        const reportsByYear = groupBy(reportsForFilingPeriod, (report) =>
+          report.fy.toString()
+        )
+        const reportsWithQ4 = Object.values(reportsByYear).flatMap(
+          calculateYtdToQuarter
+        )
+        record[tag] = reportsWithQ4
         return record
       }, {} as Record<string, ReportPretty[]>),
   } as EarningsMetric

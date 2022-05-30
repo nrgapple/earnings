@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { config } from '../config'
 import {
   Defined,
@@ -11,6 +12,11 @@ import {
 export const errorsCache = [] as unknown[]
 
 export const growthValues = [] as unknown[]
+
+export const getMonthsEnd = (end: string, start?: string) => {
+  if (!start) return undefined
+  return moment(end).diff(moment(start), 'months', true)
+}
 
 export const groupBy = <T>(arr: T[], func: (v: T) => string | undefined) => {
   return arr.reduce((prev, curr) => {
@@ -130,54 +136,6 @@ export const objArrToObj = <T extends string, TV extends unknown>(
   return result
 }
 
-// export const convertCurrencies = (currencies: { [key: string]: Report[] }) => {
-//   const newCurrencies = {} as Record<string, Report[]>
-//   Object.keys(currencies).forEach((key) => {
-//     const currencyConverter = new CC({ from: key, to: 'USD', amount: 100 })
-//     newCurrencies[key] = currencyConverter
-//   })
-
-//   return newCurrencies
-// }
-
-// export const calculateGrowthPercentPerQuarter = (
-//   tag: string,
-//   reports: Report[]
-// ) => {
-//   if (!reports.length)
-//     return {
-//       key: tag as keyof TagsObject,
-//       value: [],
-//     }
-//   const { percent, reportsData } = reports.reduce(
-//     (previous, currentReport) => {
-//       const percentGrowth = previous.previousReport
-//         ? calcPercentGrowth(previous.previousReport, currentReport)
-//         : undefined
-//       previous.reportsData.push({
-//         end: currentReport.end,
-//         val: currentReport.val,
-//       })
-//       return {
-//         percent: percentGrowth
-//           ? percentGrowth + previous.percent
-//           : previous.percent,
-//         previousReport: currentReport,
-//         reportsData: previous.reportsData,
-//       }
-//     },
-//     {
-//       percent: 0,
-//       previousReport: undefined as Report | undefined,
-//       reportsData: [] as ReportPretty[],
-//     }
-//   )
-//   return {
-//     key: tag as keyof TagsObject,
-//     value: reportsData,
-//   }
-// }
-
 export const getQuarterFromMonth = (endMonth: number) => {
   if (endMonth > 2 && endMonth < 5) {
     return 'Q1'
@@ -272,6 +230,34 @@ export const setQuarterFromFrame = (report: ReportPretty) => {
     fp,
     fy,
   } as ReportPretty
+}
+
+export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
+  const reportsByPeriod = Object.values(
+    groupBy(reports, (report) => report.fp)
+  ).flat()
+  if (reportsByPeriod.length === 4) {
+    return reportsByPeriod.reduce(
+      (prevData, currentReport) => {
+        if (prevData.reports.length === 0) {
+          prevData.reports.push(currentReport)
+          prevData.prevRevenue = currentReport.val!
+        } else {
+          const currentRevenue = currentReport.val! - prevData.prevRevenue
+          const prevReport = prevData.reports[prevData.reports.length - 1]
+          prevData.reports.push({
+            ...currentReport,
+            val: currentRevenue,
+            start: prevReport.end,
+            fp: currentReport.fp === 'FY' ? 'Q4' : currentReport.fp,
+          })
+        }
+        return prevData
+      },
+      { reports: [] as ReportPretty[], prevRevenue: 0 }
+    ).reports
+  }
+  return reports
 }
 
 export const checkAndAddMissingQuarter = (reports: ReportPretty[]) => {

@@ -17,6 +17,7 @@
     "gridjs-react": "^5.0.2",
     "ioredis": "^5.0.4",
     "mobx": "^6.6.0",
+    "moment": "^2.29.3",
     "next": "latest",
     "next-swagger-doc": "^0.3.4",
     "react": "^17.0.2",

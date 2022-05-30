@@ -112,42 +112,42 @@ export const load = (earning: EarningsMetric) => {
   }
 
   // CommitmentsAndContingencies
-  tags['CommitmentsAndContingencies'] = [
-    ...(earning.metrics['CommitmentsAndContingencies'] ?? []),
-  ]
+  // tags['CommitmentsAndContingencies'] = [
+  //   ...(earning.metrics['CommitmentsAndContingencies'] ?? []),
+  // ]
 
   // TemporaryEquity
-  tags['TemporaryEquity'] = [
-    ...(earning.metrics['TemporaryEquityRedemptionValue'] ?? []),
-    ...(earning.metrics['RedeemablePreferredStockCarryingAmount'] ?? []),
-    ...(earning.metrics['TemporaryEquityCarryingAmount'] ?? []),
-    ...(earning.metrics[
-      'TemporaryEquityValueExcludingAdditionalPaidInCapital'
-    ] ?? []),
-    ...(earning.metrics['TemporaryEquityCarryingAmountAttributableToParent'] ??
-      []),
-    ...(earning.metrics['RedeemableNoncontrollingInterestEquityFairValue'] ??
-      []),
-  ]
+  // tags['TemporaryEquity'] = [
+  //   ...(earning.metrics['TemporaryEquityRedemptionValue'] ?? []),
+  //   ...(earning.metrics['RedeemablePreferredStockCarryingAmount'] ?? []),
+  //   ...(earning.metrics['TemporaryEquityCarryingAmount'] ?? []),
+  //   ...(earning.metrics[
+  //     'TemporaryEquityValueExcludingAdditionalPaidInCapital'
+  //   ] ?? []),
+  //   ...(earning.metrics['TemporaryEquityCarryingAmountAttributableToParent'] ??
+  //     []),
+  //   ...(earning.metrics['RedeemableNoncontrollingInterestEquityFairValue'] ??
+  //     []),
+  // ]
 
   // RedeemableNoncontrollingInterest (added to temporary equity)
-  var redeemableNoncontrollingInterest = [
-    ...(earning.metrics[
-      'RedeemableNoncontrollingInterestEquityCarryingAmount'
-    ] ?? []),
-    ...(earning.metrics[
-      'RedeemableNoncontrollingInterestEquityCommonCarryingAmount'
-    ] ?? []),
-  ]
+  // var redeemableNoncontrollingInterest = [
+  //   ...(earning.metrics[
+  //     'RedeemableNoncontrollingInterestEquityCarryingAmount'
+  //   ] ?? []),
+  //   ...(earning.metrics[
+  //     'RedeemableNoncontrollingInterestEquityCommonCarryingAmount'
+  //   ] ?? []),
+  // ]
 
-  // This adds redeemable noncontrolling interest and temporary equity which are rare, but can be reported seperately
-  if (tags['TemporaryEquity']) {
-    tags['TemporaryEquity'] = getCalculateTag(
-      tags['TemporaryEquity'],
-      redeemableNoncontrollingInterest,
-      '+'
-    )
-  }
+  // // This adds redeemable noncontrolling interest and temporary equity which are rare, but can be reported seperately
+  // if (tags['TemporaryEquity']) {
+  //   tags['TemporaryEquity'] = getCalculateTag(
+  //     tags['TemporaryEquity'],
+  //     redeemableNoncontrollingInterest,
+  //     '+'
+  //   )
+  // }
 
   // Equity
   tags['Equity'] = [
@@ -165,18 +165,18 @@ export const load = (earning: EarningsMetric) => {
   ]
 
   // EquityAttributableToNoncontrollingInterest
-  tags['EquityAttributableToNoncontrollingInterest'] = [
-    ...(earning.metrics['MinorityInterest'] ?? []),
-    ...(earning.metrics[
-      'PartnersCapitalAttributableToNoncontrollingInterest'
-    ] ?? []),
-  ]
+  // tags['EquityAttributableToNoncontrollingInterest'] = [
+  //   ...(earning.metrics['MinorityInterest'] ?? []),
+  //   ...(earning.metrics[
+  //     'PartnersCapitalAttributableToNoncontrollingInterest'
+  //   ] ?? []),
+  // ]
 
   // EquityAttributableToParent
-  tags['EquityAttributableToParent'] = [
-    ...(earning.metrics['StockholdersEquity'] ?? []),
-    ...(earning.metrics['LiabilitiesAndPartnersCapital'] ?? []),
-  ]
+  // tags['EquityAttributableToParent'] = [
+  //   ...(earning.metrics['StockholdersEquity'] ?? []),
+  //   ...(earning.metrics['LiabilitiesAndPartnersCapital'] ?? []),
+  // ]
 
   // BS Adjustments
   // If total assets is missing, try using current assets
@@ -224,16 +224,16 @@ export const load = (earning: EarningsMetric) => {
   }
 
   // Impute: Equity based no parent and noncontrolling interest being present
-  if (
-    tags['EquityAttributableToNoncontrollingInterest'] !== undefined &&
-    tags['EquityAttributableToParent'] !== undefined
-  ) {
-    tags['Equity'] = getCalculateTag(
-      tags['EquityAttributableToParent'],
-      tags['EquityAttributableToNoncontrollingInterest'],
-      '+'
-    )
-  }
+  // if (
+  //   tags['EquityAttributableToNoncontrollingInterest'] !== undefined &&
+  //   tags['EquityAttributableToParent'] !== undefined
+  // ) {
+  //   tags['Equity'] = getCalculateTag(
+  //     tags['EquityAttributableToParent'],
+  //     tags['EquityAttributableToNoncontrollingInterest'],
+  //     '+'
+  //   )
+  // }
 
   if (
     tags['Equity'] === undefined &&
@@ -355,10 +355,10 @@ export const load = (earning: EarningsMetric) => {
   ]
 
   // OtherOperatingIncome
-  tags['OtherOperatingIncome'] = [
-    ...(earning.metrics['OtherOperatingIncome'] ?? []),
-    ...(earning.metrics['OtherOperatingIncome'] ?? []),
-  ]
+  // tags['OtherOperatingIncome'] = [
+  //   ...(earning.metrics['OtherOperatingIncome'] ?? []),
+  //   ...(earning.metrics['OtherOperatingIncome'] ?? []),
+  // ]
 
   // OperatingIncomeLoss
   tags['OperatingIncomeLoss'] = [
@@ -386,45 +386,45 @@ export const load = (earning: EarningsMetric) => {
     ] ?? []),
   ]
   // IncomeFromEquityMethodInvestments
-  tags['IncomeFromEquityMethodInvestments'] = [
-    ...(earning.metrics['IncomeLossFromEquityMethodInvestments'] ?? []),
-    ...(earning.metrics['IncomeLossFromEquityMethodInvestments'] ?? []),
-  ]
-  // IncomeFromContinuingOperationsBeforeTax
-  tags['IncomeFromContinuingOperationsBeforeTax'] = [
-    ...(earning.metrics[
-      'IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'
-    ] ?? []),
-    ...(earning.metrics[
-      'IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest'
-    ] ?? []),
-  ]
+  // tags['IncomeFromEquityMethodInvestments'] = [
+  //   ...(earning.metrics['IncomeLossFromEquityMethodInvestments'] ?? []),
+  //   ...(earning.metrics['IncomeLossFromEquityMethodInvestments'] ?? []),
+  // ]
+  // // IncomeFromContinuingOperationsBeforeTax
+  // tags['IncomeFromContinuingOperationsBeforeTax'] = [
+  //   ...(earning.metrics[
+  //     'IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'
+  //   ] ?? []),
+  //   ...(earning.metrics[
+  //     'IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest'
+  //   ] ?? []),
+  // ]
 
   // IncomeTaxExpenseBenefit
-  tags['IncomeTaxExpenseBenefit'] = [
-    ...(earning.metrics['IncomeTaxExpenseBenefit'] ?? []),
-    ...(earning.metrics['IncomeTaxExpenseBenefitContinuingOperations'] ?? []),
-  ]
-  // IncomeFromContinuingOperationsAfterTax
-  tags['IncomeFromContinuingOperationsAfterTax'] = [
-    ...(earning.metrics[
-      'IncomeLossBeforeExtraordinaryItemsAndCumulativeEffectOfChangeInAccountingPrinciple'
-    ] ?? []),
-    ...(earning.metrics[
-      'IncomeLossBeforeExtraordinaryItemsAndCumulativeEffectOfChangeInAccountingPrinciple'
-    ] ?? []),
-  ]
-  // IncomeFromDiscontinuedOperations
-  tags['IncomeFromDiscontinuedOperations'] = [
-    ...(earning.metrics['IncomeLossFromDiscontinuedOperationsNetOfTax'] ?? []),
-    ...(earning.metrics[
-      'DiscontinuedOperationGainLossOnDisposalOfDiscontinuedOperationNetOfTax'
-    ] ?? []),
-    ...(earning.metrics[
-      'IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToReportingEntity'
-    ] ?? []),
-  ]
-  // ExtraordaryItemsGainLoss
+  // tags['IncomeTaxExpenseBenefit'] = [
+  //   ...(earning.metrics['IncomeTaxExpenseBenefit'] ?? []),
+  //   ...(earning.metrics['IncomeTaxExpenseBenefitContinuingOperations'] ?? []),
+  // ]
+  // // IncomeFromContinuingOperationsAfterTax
+  // tags['IncomeFromContinuingOperationsAfterTax'] = [
+  //   ...(earning.metrics[
+  //     'IncomeLossBeforeExtraordinaryItemsAndCumulativeEffectOfChangeInAccountingPrinciple'
+  //   ] ?? []),
+  //   ...(earning.metrics[
+  //     'IncomeLossBeforeExtraordinaryItemsAndCumulativeEffectOfChangeInAccountingPrinciple'
+  //   ] ?? []),
+  // ]
+  // // IncomeFromDiscontinuedOperations
+  // tags['IncomeFromDiscontinuedOperations'] = [
+  //   ...(earning.metrics['IncomeLossFromDiscontinuedOperationsNetOfTax'] ?? []),
+  //   ...(earning.metrics[
+  //     'DiscontinuedOperationGainLossOnDisposalOfDiscontinuedOperationNetOfTax'
+  //   ] ?? []),
+  //   ...(earning.metrics[
+  //     'IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToReportingEntity'
+  //   ] ?? []),
+  // ]
+  // // ExtraordaryItemsGainLoss
   tags['ExtraordaryItemsGainLoss'] = [
     ...(earning.metrics['ExtraordinaryItemNetOfTax'] ?? []),
     ...(earning.metrics['ExtraordinaryItemNetOfTax'] ?? []),
@@ -451,187 +451,174 @@ export const load = (earning: EarningsMetric) => {
     ...(earning.metrics['PreferredStockDividendsAndOtherAdjustments'] ?? []),
   ]
   // #NetIncomeAttributableToNoncontrollingInterest
-  tags['NetIncomeAttributableToNoncontrollingInterest'] = [
-    ...(earning.metrics['NetIncomeLossAttributableToNoncontrollingInterest'] ??
-      []),
-  ]
+  // tags['NetIncomeAttributableToNoncontrollingInterest'] = [
+  //   ...(earning.metrics['NetIncomeLossAttributableToNoncontrollingInterest'] ??
+  //     []),
+  // ]
 
   // #NetIncomeAttributableToParent
-  tags['NetIncomeAttributableToParent'] = [
-    ...(earning.metrics['NetIncomeLoss'] ?? []),
-  ]
+  // tags['NetIncomeAttributableToParent'] = [
+  //   ...(earning.metrics['NetIncomeLoss'] ?? []),
+  // ]
 
   // OtherComprehensiveIncome
-  tags['OtherComprehensiveIncome'] = [
-    ...(earning.metrics['OtherComprehensiveIncomeLossNetOfTax'] ?? []),
-    ...(earning.metrics['OtherComprehensiveIncomeLossNetOfTax'] ?? []),
-  ]
+  // tags['OtherComprehensiveIncome'] = [
+  //   ...(earning.metrics['OtherComprehensiveIncomeLossNetOfTax'] ?? []),
+  //   ...(earning.metrics['OtherComprehensiveIncomeLossNetOfTax'] ?? []),
+  // ]
 
   // ComprehensiveIncome
-  tags['ComprehensiveIncome'] = [
-    ...(earning.metrics[
-      'ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest'
-    ] ?? []),
-    ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
-  ]
+  // tags['ComprehensiveIncome'] = [
+  //   ...(earning.metrics[
+  //     'ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest'
+  //   ] ?? []),
+  //   ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
+  // ]
 
   // ComprehensiveIncomeAttributableToParent
-  tags['ComprehensiveIncomeAttributableToParent'] = [
-    ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
-    ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
-  ]
+  // tags['ComprehensiveIncomeAttributableToParent'] = [
+  //   ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
+  //   ...(earning.metrics['ComprehensiveIncomeNetOfTax'] ?? []),
+  // ]
 
   // ComprehensiveIncomeAttributableToNoncontrollingInterest
-  tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] = [
-    ...(earning.metrics[
-      'ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest'
-    ] ?? []),
-    ...(earning.metrics[
-      'ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest'
-    ] ?? []),
-  ]
+  // tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] = [
+  //   ...(earning.metrics[
+  //     'ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest'
+  //   ] ?? []),
+  //   ...(earning.metrics[
+  //     'ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest'
+  //   ] ?? []),
+  // ]
 
   // 'Adjustments to income statement information
   // Impute: NonoperatingIncomeLossPlusInterestAndDebtExpense
-  tags['NonoperatingIncomeLossPlusInterestAndDebtExpense'] = getCalculateTag(
-    tags['NonoperatingIncomeLoss'],
-    tags['InterestAndDebtExpense'],
-    '+'
-  )
+  // tags['NonoperatingIncomeLossPlusInterestAndDebtExpense'] = getCalculateTag(
+  //   tags['NonoperatingIncomeLoss'],
+  //   tags['InterestAndDebtExpense'],
+  //   '+'
+  // )
 
   // Impute: Net income available to common stockholders  (if it does not exist)
-  if (
-    tags['NetIncomeAvailableToCommonStockholdersBasic'] === undefined &&
-    tags['PreferredStockDividendsAndOtherAdjustments'] === undefined &&
-    tags['NetIncomeAttributableToParent'] !== undefined
-  ) {
-    tags['NetIncomeAvailableToCommonStockholdersBasic'] =
-      tags['NetIncomeAttributableToParent']
-  }
+  // if (
+  //   tags['NetIncomeAvailableToCommonStockholdersBasic'] === undefined &&
+  //   tags['PreferredStockDividendsAndOtherAdjustments'] === undefined &&
+  //   tags['NetIncomeAttributableToParent'] !== undefined
+  // ) {
+  //   tags['NetIncomeAvailableToCommonStockholdersBasic'] =
+  //     tags['NetIncomeAttributableToParent']
+  // }
 
   // Impute NetIncomeLoss
-  if (
-    tags['NetIncomeLoss'] !== undefined &&
-    tags['IncomeFromContinuingOperationsAfterTax'] === undefined
-  ) {
-    tags['IncomeFromContinuingOperationsAfterTax'] = getCalculateTag(
-      getCalculateTag(
-        tags['NetIncomeLoss'],
-        tags['IncomeFromDiscontinuedOperations'],
-        '-'
-      ),
-      tags['ExtraordaryItemsGainLoss'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['NetIncomeLoss'] !== undefined &&
+  //   tags['IncomeFromContinuingOperationsAfterTax'] === undefined
+  // ) {
+  //   tags['IncomeFromContinuingOperationsAfterTax'] = getCalculateTag(
+  //     getCalculateTag(
+  //       tags['NetIncomeLoss'],
+  //       tags['IncomeFromDiscontinuedOperations'],
+  //       '-'
+  //     ),
+  //     tags['ExtraordaryItemsGainLoss'],
+  //     '-'
+  //   )
+  // }
 
   // Impute: Net income attributable to parent if it does not exist
-  if (
-    tags['NetIncomeAttributableToParent'] === undefined &&
-    tags['NetIncomeAttributableToNoncontrollingInterest'] === undefined &&
-    tags['NetIncomeLoss'] !== undefined
-  ) {
-    tags['NetIncomeAttributableToParent'] = tags['NetIncomeLoss']
-  }
+  // if (
+  //   tags['NetIncomeAttributableToParent'] === undefined &&
+  //   tags['NetIncomeAttributableToNoncontrollingInterest'] === undefined &&
+  //   tags['NetIncomeLoss'] !== undefined
+  // ) {
+  //   tags['NetIncomeAttributableToParent'] = tags['NetIncomeLoss']
+  // }
 
-  // Impute: PreferredStockDividendsAndOtherAdjustments
-  if (
-    tags['PreferredStockDividendsAndOtherAdjustments'] === undefined &&
-    tags['NetIncomeAttributableToParent'] !== undefined &&
-    tags['NetIncomeAvailableToCommonStockholdersBasic'] !== undefined
-  ) {
-    tags['PreferredStockDividendsAndOtherAdjustments'] = getCalculateTag(
-      tags['NetIncomeAttributableToParent'],
-      tags['NetIncomeAvailableToCommonStockholdersBasic'],
-      '-'
-    )
-  }
+  // // Impute: PreferredStockDividendsAndOtherAdjustments
+  // if (
+  //   tags['PreferredStockDividendsAndOtherAdjustments'] === undefined &&
+  //   tags['NetIncomeAttributableToParent'] !== undefined &&
+  //   tags['NetIncomeAvailableToCommonStockholdersBasic'] !== undefined
+  // ) {
+  //   tags['PreferredStockDividendsAndOtherAdjustments'] = getCalculateTag(
+  //     tags['NetIncomeAttributableToParent'],
+  //     tags['NetIncomeAvailableToCommonStockholdersBasic'],
+  //     '-'
+  //   )
+  // }
 
   // Impute: comprehensive income
-  if (
-    tags['ComprehensiveIncomeAttributableToParent'] === undefined &&
-    tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] ===
-      undefined &&
-    tags['ComprehensiveIncome'] === undefined &&
-    tags['OtherComprehensiveIncome'] === undefined
-  ) {
-    tags['ComprehensiveIncome'] = tags['NetIncomeLoss']
-  }
+  // if (
+  //   tags['ComprehensiveIncomeAttributableToParent'] === undefined &&
+  //   tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] ===
+  //     undefined &&
+  //   tags['ComprehensiveIncome'] === undefined &&
+  //   tags['OtherComprehensiveIncome'] === undefined
+  // ) {
+  //   tags['ComprehensiveIncome'] = tags['NetIncomeLoss']
+  // }
 
   // Impute: other comprehensive income
-  if (
-    tags['ComprehensiveIncome'] !== undefined &&
-    tags['OtherComprehensiveIncome'] === undefined
-  ) {
-    tags['OtherComprehensiveIncome'] = getCalculateTag(
-      tags['ComprehensiveIncome'],
-      tags['NetIncomeLoss'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['ComprehensiveIncome'] !== undefined &&
+  //   tags['OtherComprehensiveIncome'] === undefined
+  // ) {
+  //   tags['OtherComprehensiveIncome'] = getCalculateTag(
+  //     tags['ComprehensiveIncome'],
+  //     tags['NetIncomeLoss'],
+  //     '-'
+  //   )
+  // }
 
   // Impute: comprehensive income attributable to parent if it does not exist
-  if (
-    tags['ComprehensiveIncomeAttributableToParent'] === undefined &&
-    tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] ===
-      undefined &&
-    tags['ComprehensiveIncome'] !== undefined
-  ) {
-    tags['ComprehensiveIncomeAttributableToParent'] =
-      tags['ComprehensiveIncome']
-  }
+  // if (
+  //   tags['ComprehensiveIncomeAttributableToParent'] === undefined &&
+  //   tags['ComprehensiveIncomeAttributableToNoncontrollingInterest'] ===
+  //     undefined &&
+  //   tags['ComprehensiveIncome'] !== undefined
+  // ) {
+  //   tags['ComprehensiveIncomeAttributableToParent'] =
+  //     tags['ComprehensiveIncome']
+  // }
 
-  // Impute: IncomeFromContinuingOperations*Before*Tax
-  if (
-    tags['IncomeBeforeEquityMethodInvestments'] !== undefined &&
-    tags['IncomeFromEquityMethodInvestments'] !== undefined &&
-    tags['IncomeFromContinuingOperationsBeforeTax'] === undefined
-  ) {
-    tags['IncomeFromContinuingOperationsBeforeTax'] = getCalculateTag(
-      tags['IncomeBeforeEquityMethodInvestments'],
-      tags['IncomeFromEquityMethodInvestments'],
-      '+'
-    )
-  }
+  // // Impute: IncomeFromContinuingOperations*Before*Tax
+  // if (
+  //   tags['IncomeBeforeEquityMethodInvestments'] !== undefined &&
+  //   tags['IncomeFromEquityMethodInvestments'] !== undefined &&
+  //   tags['IncomeFromContinuingOperationsBeforeTax'] === undefined
+  // ) {
+  //   tags['IncomeFromContinuingOperationsBeforeTax'] = getCalculateTag(
+  //     tags['IncomeBeforeEquityMethodInvestments'],
+  //     tags['IncomeFromEquityMethodInvestments'],
+  //     '+'
+  //   )
+  // }
 
-  // Impute: IncomeFromContinuingOperations*Before*Tax2 (if income before tax is missing)
-  if (
-    tags['IncomeFromContinuingOperationsBeforeTax'] === undefined &&
-    tags['IncomeFromContinuingOperationsAfterTax'] !== undefined
-  ) {
-    tags['IncomeFromContinuingOperationsBeforeTax'] = getCalculateTag(
-      tags['IncomeFromContinuingOperationsAfterTax'],
-      tags['IncomeTaxExpenseBenefit'],
-      '+'
-    )
-  }
+  // // Impute: IncomeFromContinuingOperations*Before*Tax2 (if income before tax is missing)
+  // if (
+  //   tags['IncomeFromContinuingOperationsBeforeTax'] === undefined &&
+  //   tags['IncomeFromContinuingOperationsAfterTax'] !== undefined
+  // ) {
+  //   tags['IncomeFromContinuingOperationsBeforeTax'] = getCalculateTag(
+  //     tags['IncomeFromContinuingOperationsAfterTax'],
+  //     tags['IncomeTaxExpenseBenefit'],
+  //     '+'
+  //   )
+  // }
 
-  // Impute: IncomeFromContinuingOperations*After*Tax
-  if (
-    tags['IncomeFromContinuingOperationsAfterTax'] === undefined &&
-    (tags['IncomeTaxExpenseBenefit'] !== undefined ||
-      tags['IncomeTaxExpenseBenefit'] === undefined) &&
-    tags['IncomeFromContinuingOperationsBeforeTax'] !== undefined
-  ) {
-    tags['IncomeFromContinuingOperationsAfterTax'] = getCalculateTag(
-      tags['IncomeFromContinuingOperationsBeforeTax'],
-      tags['IncomeTaxExpenseBenefit'],
-      '-'
-    )
-  }
-
-  // Impute: GrossProfit
-  if (
-    tags['GrossProfit'] === undefined &&
-    tags['Revenues'] !== undefined &&
-    tags['CostOfRevenue'] !== undefined
-  ) {
-    tags['GrossProfit'] = getCalculateTag(
-      tags['Revenues'],
-      tags['CostOfRevenue'],
-      '-'
-    )
-  }
+  // // Impute: IncomeFromContinuingOperations*After*Tax
+  // if (
+  //   tags['IncomeFromContinuingOperationsAfterTax'] === undefined &&
+  //   (tags['IncomeTaxExpenseBenefit'] !== undefined ||
+  //     tags['IncomeTaxExpenseBenefit'] === undefined) &&
+  //   tags['IncomeFromContinuingOperationsBeforeTax'] !== undefined
+  // ) {
+  //   tags['IncomeFromContinuingOperationsAfterTax'] = getCalculateTag(
+  //     tags['IncomeFromContinuingOperationsBeforeTax'],
+  //     tags['IncomeTaxExpenseBenefit'],
+  //     '-'
+  //   )
+  // }
 
   // Impute: GrossProfit
   if (
@@ -744,107 +731,107 @@ export const load = (earning: EarningsMetric) => {
   }
 
   // Impute: IncomeBeforeEquityMethodInvestments
-  if (
-    tags['IncomeBeforeEquityMethodInvestments'] === undefined &&
-    tags['IncomeFromContinuingOperationsBeforeTax'] !== undefined
-  ) {
-    tags['IncomeBeforeEquityMethodInvestments'] = getCalculateTag(
-      tags['IncomeFromContinuingOperationsBeforeTax'],
-      tags['IncomeFromEquityMethodInvestments'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['IncomeBeforeEquityMethodInvestments'] === undefined &&
+  //   tags['IncomeFromContinuingOperationsBeforeTax'] !== undefined
+  // ) {
+  //   tags['IncomeBeforeEquityMethodInvestments'] = getCalculateTag(
+  //     tags['IncomeFromContinuingOperationsBeforeTax'],
+  //     tags['IncomeFromEquityMethodInvestments'],
+  //     '-'
+  //   )
+  // }
 
   // Impute: IncomeBeforeEquityMethodInvestments
-  if (
-    tags['OperatingIncomeLoss'] !== undefined &&
-    tags['NonoperatingIncomeLoss'] !== undefined &&
-    tags['InterestAndDebtExpense'] == undefined &&
-    tags['IncomeBeforeEquityMethodInvestments'] !== undefined
-  ) {
-    tags['InterestAndDebtExpense'] = getCalculateTag(
-      tags['IncomeBeforeEquityMethodInvestments'],
-      getCalculateTag(
-        tags['OperatingIncomeLoss'],
-        tags['NonoperatingIncomeLoss'],
-        '+'
-      ),
-      '-'
-    )
-  }
+  // if (
+  //   tags['OperatingIncomeLoss'] !== undefined &&
+  //   tags['NonoperatingIncomeLoss'] !== undefined &&
+  //   tags['InterestAndDebtExpense'] == undefined &&
+  //   tags['IncomeBeforeEquityMethodInvestments'] !== undefined
+  // ) {
+  //   tags['InterestAndDebtExpense'] = getCalculateTag(
+  //     tags['IncomeBeforeEquityMethodInvestments'],
+  //     getCalculateTag(
+  //       tags['OperatingIncomeLoss'],
+  //       tags['NonoperatingIncomeLoss'],
+  //       '+'
+  //     ),
+  //     '-'
+  //   )
+  // }
 
   // Impute: OtherOperatingIncome
-  if (
-    tags['GrossProfit'] !== undefined &&
-    tags['OperatingExpenses'] !== undefined &&
-    tags['OperatingIncomeLoss'] !== undefined
-  ) {
-    tags['OtherOperatingIncome'] = getCalculateTag(
-      tags['OperatingIncomeLoss'],
-      getCalculateTag(tags['GrossProfit'], tags['OperatingExpenses'], '-'),
-      '-'
-    )
-  }
+  // if (
+  //   tags['GrossProfit'] !== undefined &&
+  //   tags['OperatingExpenses'] !== undefined &&
+  //   tags['OperatingIncomeLoss'] !== undefined
+  // ) {
+  //   tags['OtherOperatingIncome'] = getCalculateTag(
+  //     tags['OperatingIncomeLoss'],
+  //     getCalculateTag(tags['GrossProfit'], tags['OperatingExpenses'], '-'),
+  //     '-'
+  //   )
+  // }
 
   // Move IncomeFromEquityMethodInvestments
-  if (
-    tags['IncomeFromEquityMethodInvestments'] !== undefined &&
-    tags['IncomeBeforeEquityMethodInvestments'] !== undefined &&
-    tags['IncomeBeforeEquityMethodInvestments'] !==
-      tags['IncomeFromContinuingOperationsBeforeTax']
-  ) {
-    tags['IncomeBeforeEquityMethodInvestments'] = getCalculateTag(
-      tags['IncomeFromContinuingOperationsBeforeTax'],
-      tags['IncomeFromEquityMethodInvestments'],
-      '-'
-    )
-    tags['OperatingIncomeLoss'] = getCalculateTag(
-      tags['OperatingIncomeLoss'],
-      tags['IncomeFromEquityMethodInvestments'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['IncomeFromEquityMethodInvestments'] !== undefined &&
+  //   tags['IncomeBeforeEquityMethodInvestments'] !== undefined &&
+  //   tags['IncomeBeforeEquityMethodInvestments'] !==
+  //     tags['IncomeFromContinuingOperationsBeforeTax']
+  // ) {
+  //   tags['IncomeBeforeEquityMethodInvestments'] = getCalculateTag(
+  //     tags['IncomeFromContinuingOperationsBeforeTax'],
+  //     tags['IncomeFromEquityMethodInvestments'],
+  //     '-'
+  //   )
+  //   tags['OperatingIncomeLoss'] = getCalculateTag(
+  //     tags['OperatingIncomeLoss'],
+  //     tags['IncomeFromEquityMethodInvestments'],
+  //     '-'
+  //   )
+  // }
 
   // DANGEROUS!!  May need to turn off. IS3 had 2085 PASSES WITHOUT this imputing. if it is higher,: keep the test
   // Impute: OperatingIncomeLoss
-  if (
-    tags['OperatingIncomeLoss'] === undefined &&
-    tags['IncomeBeforeEquityMethodInvestments'] !== undefined
-  ) {
-    tags['OperatingIncomeLoss'] = getCalculateTag(
-      getCalculateTag(
-        tags['IncomeBeforeEquityMethodInvestments'],
-        tags['NonoperatingIncomeLoss'],
-        '+'
-      ),
-      tags['InterestAndDebtExpense'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['OperatingIncomeLoss'] === undefined &&
+  //   tags['IncomeBeforeEquityMethodInvestments'] !== undefined
+  // ) {
+  //   tags['OperatingIncomeLoss'] = getCalculateTag(
+  //     getCalculateTag(
+  //       tags['IncomeBeforeEquityMethodInvestments'],
+  //       tags['NonoperatingIncomeLoss'],
+  //       '+'
+  //     ),
+  //     tags['InterestAndDebtExpense'],
+  //     '-'
+  //   )
+  // }
 
-  tags[
-    'NonoperatingIncomePlusInterestAndDebtExpensePlusIncomeFromEquityMethodInvestments'
-  ] = getCalculateTag(
-    tags['IncomeFromContinuingOperationsBeforeTax'],
-    tags['OperatingIncomeLoss'],
-    '-'
-  )
+  // tags[
+  //   'NonoperatingIncomePlusInterestAndDebtExpensePlusIncomeFromEquityMethodInvestments'
+  // ] = getCalculateTag(
+  //   tags['IncomeFromContinuingOperationsBeforeTax'],
+  //   tags['OperatingIncomeLoss'],
+  //   '-'
+  // )
 
-  // NonoperatingIncomeLossPlusInterestAndDebtExpense
-  if (
-    tags['NonoperatingIncomeLossPlusInterestAndDebtExpense'] === undefined &&
-    tags[
-      'NonoperatingIncomePlusInterestAndDebtExpensePlusIncomeFromEquityMethodInvestments'
-    ] !== undefined
-  ) {
-    tags['NonoperatingIncomeLossPlusInterestAndDebtExpense'] = getCalculateTag(
-      tags[
-        'NonoperatingIncomePlusInterestAndDebtExpensePlusIncomeFromEquityMethodInvestments'
-      ],
-      tags['IncomeFromEquityMethodInvestments'],
-      '-'
-    )
-  }
+  // // NonoperatingIncomeLossPlusInterestAndDebtExpense
+  // if (
+  //   tags['NonoperatingIncomeLossPlusInterestAndDebtExpense'] === undefined &&
+  //   tags[
+  //     'NonoperatingIncomePlusInterestAndDebtExpensePlusIncomeFromEquityMethodInvestments'
+  //   ] !== undefined
+  // ) {
+  //   tags['NonoperatingIncomeLossPlusInterestAndDebtExpense'] = getCalculateTag(
+  //     tags[
+  //       'NonoperatingIncomePlusInterestAndDebtExpensePlusIncomeFromEquityMethodInvestments'
+  //     ],
+  //     tags['IncomeFromEquityMethodInvestments'],
+  //     '-'
+  //   )
+  // }
 
   // Cash flow statement
 
@@ -858,59 +845,68 @@ export const load = (earning: EarningsMetric) => {
   // NetCashFlowsOperating
   tags['NetCashFlowsOperating'] = [
     ...(earning.metrics['NetCashProvidedByUsedInOperatingActivities'] ?? []),
-  ]
-
-  // NetCashFlowsInvesting
-  tags['NetCashFlowsInvesting'] = [
-    ...(earning.metrics['NetCashProvidedByUsedInInvestingActivities'] ?? []),
-  ]
-
-  // NetCashFlowsFinancing
-  tags['NetCashFlowsFinancing'] = [
-    ...(earning.metrics['NetCashProvidedByUsedInFinancingActivities'] ?? []),
-  ]
-
-  // NetCashFlowsOperatingContinuing
-  tags['NetCashFlowsOperatingContinuing'] = [
     ...(earning.metrics[
       'NetCashProvidedByUsedInOperatingActivitiesContinuingOperations'
     ] ?? []),
   ]
 
-  // NetCashFlowsInvestingContinuing
-  tags['NetCashFlowsInvestingContinuing'] = [
+  // NetCashFlowsInvesting
+  tags['NetCashFlowsInvesting'] = [
+    ...(earning.metrics['NetCashProvidedByUsedInInvestingActivities'] ?? []),
     ...(earning.metrics[
       'NetCashProvidedByUsedInInvestingActivitiesContinuingOperations'
     ] ?? []),
   ]
-  // NetCashFlowsFinancingContinuing
-  tags['NetCashFlowsFinancingContinuing'] =
-    earning.metrics[
+
+  // NetCashFlowsFinancing
+  tags['NetCashFlowsFinancing'] = [
+    ...(earning.metrics['NetCashProvidedByUsedInFinancingActivities'] ?? []),
+    ...(earning.metrics[
       'NetCashProvidedByUsedInFinancingActivitiesContinuingOperations'
-    ]
-
-  // NetCashFlowsOperatingDiscontinued
-  tags['NetCashFlowsOperatingDiscontinued'] =
-    earning.metrics[
-      'CashProvidedByUsedInOperatingActivitiesDiscontinuedOperations'
-    ]
-
-  // NetCashFlowsInvestingDiscontinued
-  tags['NetCashFlowsInvestingDiscontinued'] =
-    earning.metrics[
-      'CashProvidedByUsedInInvestingActivitiesDiscontinuedOperations'
-    ]
-
-  // NetCashFlowsFinancingDiscontinued
-  tags['NetCashFlowsFinancingDiscontinued'] =
-    earning.metrics[
-      'CashProvidedByUsedInFinancingActivitiesDiscontinuedOperations'
-    ]
-
-  // NetCashFlowsDiscontinued
-  tags['NetCashFlowsDiscontinued'] = [
-    ...(earning.metrics['NetCashProvidedByUsedInDiscontinuedOperations'] ?? []),
+    ] ?? []),
   ]
+
+  // // NetCashFlowsOperationContinuing
+  // tags['NetCashFlowsOperationContinuing'] = [
+  //   ...(earning.metrics[
+  //     'NetCashProvidedByUsedInOperatingActivitiesContinuingOperations'
+  //   ] ?? []),
+  // ]
+
+  // // NetCashFlowsInvestingContinuing
+  // tags['NetCashFlowsInvestingContinuing'] = [
+  //   ...(earning.metrics[
+  //     'NetCashProvidedByUsedInInvestingActivitiesContinuingOperations'
+  //   ] ?? []),
+  // ]
+  // // NetCashFlowsFinancingContinuing
+  // tags['NetCashFlowsFinancingContinuing'] =
+  //   earning.metrics[
+  //     'NetCashProvidedByUsedInFinancingActivitiesContinuingOperations'
+  //   ]
+
+  // // NetCashFlowsOperatingDiscontinued
+  // tags['NetCashFlowsOperatingDiscontinued'] =
+  //   earning.metrics[
+  //     'CashProvidedByUsedInOperatingActivitiesDiscontinuedOperations'
+  //   ]
+
+  // // NetCashFlowsInvestingDiscontinued
+  // tags['NetCashFlowsInvestingDiscontinued'] =
+  //   earning.metrics[
+  //     'CashProvidedByUsedInInvestingActivitiesDiscontinuedOperations'
+  //   ]
+
+  // // NetCashFlowsFinancingDiscontinued
+  // tags['NetCashFlowsFinancingDiscontinued'] =
+  //   earning.metrics[
+  //     'CashProvidedByUsedInFinancingActivitiesDiscontinuedOperations'
+  //   ]
+
+  // // NetCashFlowsDiscontinued
+  // tags['NetCashFlowsDiscontinued'] = [
+  //   ...(earning.metrics['NetCashProvidedByUsedInDiscontinuedOperations'] ?? []),
+  // ]
 
   // ExchangeGainsLosses
   tags['ExchangeGainsLosses'] = [
@@ -925,103 +921,103 @@ export const load = (earning: EarningsMetric) => {
 
   // Adjustments
   // Impute: total net cash flows discontinued if not reported
-  if (tags['NetCashFlowsDiscontinued'] === undefined) {
-    tags['NetCashFlowsDiscontinued'] = getCalculateTag(
-      getCalculateTag(
-        tags['NetCashFlowsOperatingDiscontinued'],
-        tags['NetCashFlowsInvestingDiscontinued'],
-        '+'
-      ),
-      tags['NetCashFlowsFinancingDiscontinued'],
-      '+'
-    )
-  }
+  // if (tags['NetCashFlowsDiscontinued'] === undefined) {
+  //   tags['NetCashFlowsDiscontinued'] = getCalculateTag(
+  //     getCalculateTag(
+  //       tags['NetCashFlowsOperatingDiscontinued'],
+  //       tags['NetCashFlowsInvestingDiscontinued'],
+  //       '+'
+  //     ),
+  //     tags['NetCashFlowsFinancingDiscontinued'],
+  //     '+'
+  //   )
+  // }
 
-  // Impute: cash flows from continuing
-  if (
-    tags['NetCashFlowsOperating'] !== undefined &&
-    tags['NetCashFlowsOperatingContinuing'] === undefined
-  ) {
-    tags['NetCashFlowsOperatingContinuing'] = getCalculateTag(
-      tags['NetCashFlowsOperating'],
-      tags['NetCashFlowsOperatingDiscontinued'],
-      '-'
-    )
-  }
+  // // Impute: cash flows from continuing
+  // if (
+  //   tags['NetCashFlowsOperating'] !== undefined &&
+  //   tags['NetCashFlowsOperatingContinuing'] === undefined
+  // ) {
+  //   tags['NetCashFlowsOperatingContinuing'] = getCalculateTag(
+  //     tags['NetCashFlowsOperating'],
+  //     tags['NetCashFlowsOperatingDiscontinued'],
+  //     '-'
+  //   )
+  // }
 
-  if (
-    tags['NetCashFlowsInvesting'] !== undefined &&
-    tags['NetCashFlowsInvestingContinuing'] === undefined
-  ) {
-    tags['NetCashFlowsInvestingContinuing'] = getCalculateTag(
-      tags['NetCashFlowsInvesting'],
-      tags['NetCashFlowsInvestingDiscontinued'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['NetCashFlowsInvesting'] !== undefined &&
+  //   tags['NetCashFlowsInvestingContinuing'] === undefined
+  // ) {
+  //   tags['NetCashFlowsInvestingContinuing'] = getCalculateTag(
+  //     tags['NetCashFlowsInvesting'],
+  //     tags['NetCashFlowsInvestingDiscontinued'],
+  //     '-'
+  //   )
+  // }
 
-  if (
-    tags['NetCashFlowsFinancing'] !== undefined &&
-    tags['NetCashFlowsFinancingContinuing'] === undefined
-  ) {
-    tags['NetCashFlowsFinancingContinuing'] = getCalculateTag(
-      tags['NetCashFlowsFinancing'],
-      tags['NetCashFlowsFinancingDiscontinued'],
-      '-'
-    )
-  }
+  // if (
+  //   tags['NetCashFlowsFinancing'] !== undefined &&
+  //   tags['NetCashFlowsFinancingContinuing'] === undefined
+  // ) {
+  //   tags['NetCashFlowsFinancingContinuing'] = getCalculateTag(
+  //     tags['NetCashFlowsFinancing'],
+  //     tags['NetCashFlowsFinancingDiscontinued'],
+  //     '-'
+  //   )
+  // }
 
-  if (
-    tags['NetCashFlowsOperating'] === undefined &&
-    tags['NetCashFlowsOperatingContinuing'] !== undefined &&
-    tags['NetCashFlowsOperatingDiscontinued'] === undefined
-  ) {
-    tags['NetCashFlowsOperating'] = tags['NetCashFlowsOperatingContinuing']
-  }
+  // if (
+  //   tags['NetCashFlowsOperating'] === undefined &&
+  //   tags['NetCashFlowsOperatingContinuing'] !== undefined &&
+  //   tags['NetCashFlowsOperatingDiscontinued'] === undefined
+  // ) {
+  //   tags['NetCashFlowsOperating'] = tags['NetCashFlowsOperatingContinuing']
+  // }
 
-  if (
-    tags['NetCashFlowsInvesting'] === undefined &&
-    tags['NetCashFlowsInvestingContinuing'] !== undefined &&
-    tags['NetCashFlowsInvestingDiscontinued'] === undefined
-  ) {
-    tags['NetCashFlowsInvesting'] = tags['NetCashFlowsInvestingContinuing']
-  }
+  // if (
+  //   tags['NetCashFlowsInvesting'] === undefined &&
+  //   tags['NetCashFlowsInvestingContinuing'] !== undefined &&
+  //   tags['NetCashFlowsInvestingDiscontinued'] === undefined
+  // ) {
+  //   tags['NetCashFlowsInvesting'] = tags['NetCashFlowsInvestingContinuing']
+  // }
 
-  if (
-    tags['NetCashFlowsFinancing'] === undefined &&
-    tags['NetCashFlowsFinancingContinuing'] !== undefined &&
-    tags['NetCashFlowsFinancingDiscontinued'] === undefined
-  ) {
-    tags['NetCashFlowsFinancing'] = tags['NetCashFlowsFinancingContinuing']
-  }
+  // if (
+  //   tags['NetCashFlowsFinancing'] === undefined &&
+  //   tags['NetCashFlowsFinancingContinuing'] !== undefined &&
+  //   tags['NetCashFlowsFinancingDiscontinued'] === undefined
+  // ) {
+  //   tags['NetCashFlowsFinancing'] = tags['NetCashFlowsFinancingContinuing']
+  // }
 
-  tags['NetCashFlowsContinuing'] = getCalculateTag(
-    getCalculateTag(
-      tags['NetCashFlowsOperatingContinuing'],
-      tags['NetCashFlowsInvestingContinuing'],
-      '+'
-    ),
-    tags['NetCashFlowsFinancingContinuing'],
-    '+'
-  )
+  // tags['NetCashFlowsContinuing'] = getCalculateTag(
+  //   getCalculateTag(
+  //     tags['NetCashFlowsOperatingContinuing'],
+  //     tags['NetCashFlowsInvestingContinuing'],
+  //     '+'
+  //   ),
+  //   tags['NetCashFlowsFinancingContinuing'],
+  //   '+'
+  // )
 
-  // Impute: if net cash flow is missing,: this tries to figure out the value by adding up the detail
-  if (
-    tags['NetCashFlow'] === undefined &&
-    (tags['NetCashFlowsOperating'] !== undefined ||
-      tags['NetCashFlowsInvesting'] !== undefined ||
-      tags['NetCashFlowsFinancing'] !== undefined)
-  ) {
-    tags['NetCashFlow'] = getCalculateTag(
-      getCalculateTag(
-        tags['NetCashFlowsOperating'],
-        tags['NetCashFlowsInvesting'],
-        '+'
-      ),
-      tags['NetCashFlowsFinancing'],
-      '+'
-    )
-  }
+  // // Impute: if net cash flow is missing,: this tries to figure out the value by adding up the detail
+  // if (
+  //   tags['NetCashFlow'] === undefined &&
+  //   (tags['NetCashFlowsOperating'] !== undefined ||
+  //     tags['NetCashFlowsInvesting'] !== undefined ||
+  //     tags['NetCashFlowsFinancing'] !== undefined)
+  // ) {
+  //   tags['NetCashFlow'] = getCalculateTag(
+  //     getCalculateTag(
+  //       tags['NetCashFlowsOperating'],
+  //       tags['NetCashFlowsInvesting'],
+  //       '+'
+  //     ),
+  //     tags['NetCashFlowsFinancing'],
+  //     '+'
+  //   )
+  // }
 
   const NetIncomeLossRevenues = getCalculateTag(
     tags['NetIncomeLoss'],
