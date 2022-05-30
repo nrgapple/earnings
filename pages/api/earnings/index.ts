@@ -70,7 +70,6 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     const companies = dbCompanies.map(
       (c) =>
         ({
-          ...c,
           ticker: c.ticker,
           tags: groupBy(c.reports, (v) => v.tag),
         } as Company)

@@ -1,13 +1,6 @@
 import moment from 'moment'
 import { config } from '../config'
-import {
-  Defined,
-  Earnings,
-  Report,
-  ReportPretty,
-  TagData,
-  TagsKey,
-} from '../types'
+import { Defined, Earnings, ReportPretty, TagData, TagsKey } from '../types'
 
 export const errorsCache = [] as unknown[]
 
@@ -73,7 +66,7 @@ export const timeout = (time: number) =>
     }, time)
   })
 
-export const calcPercentGrowth = (prev: Report, curr: Report) => {
+export const calcPercentGrowth = (prev: ReportPretty, curr: ReportPretty) => {
   if (!prev.val || !curr.val) {
     return 0
   }
@@ -233,31 +226,49 @@ export const setQuarterFromFrame = (report: ReportPretty) => {
 }
 
 export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
+  if (reports.some((x) => !x.start)) {
+    return reports
+  }
   const reportsByPeriod = Object.values(
     groupBy(reports, (report) => report.fp)
   ).flat()
-
   if (reportsByPeriod.length === 4) {
     const fullYearReport = reportsByPeriod.find((x) => x.endMonths === 12)
     if (fullYearReport) {
-      const nineMonthReports = reportsByPeriod.filter(
+      const quarterlyReports = reportsByPeriod.filter(
         (report) => report.endMonths === 3
       )
-      const nineMonthRevenue = nineMonthReports.reduce(
-        (acc, curr) => (acc += curr.val!),
-        0
-      )
-      return [
-        ...nineMonthReports,
-        {
-          ...fullYearReport,
-          fp: 'Q4',
-          val: fullYearReport.val! - nineMonthRevenue,
-        } as ReportPretty,
-      ]
+      if (quarterlyReports.length === 3) {
+        const nineMonthRevenue = quarterlyReports.reduce(
+          (acc, curr) => (acc += curr.val!),
+          0
+        )
+        return [
+          ...quarterlyReports,
+          {
+            ...fullYearReport,
+            fp: 'Q4',
+            val: fullYearReport.val! - nineMonthRevenue,
+          } as ReportPretty,
+        ]
+      }
     }
-
-    return reports
+  }
+  if (reportsByPeriod.every((report) => report.start === reports[0].start)) {
+    return sortReports(reportsByPeriod, 'endMonths').reduce((data, curr) => {
+      if (data.length === 0) {
+        data.push(curr)
+      } else {
+        const prev = data[data.length - 1]
+        data.push({
+          ...curr,
+          start: prev.end,
+          val: curr.val! - prev.val!,
+          endMonths: 3,
+        })
+      }
+      return data
+    }, [] as ReportPretty[])
   }
   return reports
 }
