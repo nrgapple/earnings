@@ -49,7 +49,7 @@ const Home = () => {
             {data && data.companies?.length && (
               <Grid xs justify="center">
                 <Pagination
-                  total={data.pages}
+                  total={data.pages + 1}
                   page={pageNumber}
                   onChange={(p) => {
                     setPageNumber(p)

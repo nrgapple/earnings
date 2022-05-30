@@ -1,5 +1,4 @@
 import { Report } from '../interfaces'
-import { calcPercentGrowth } from '../processor/utils'
 
 export const objArrToObj = <T extends string, TV extends unknown>(
   arr: {
@@ -41,7 +40,6 @@ export const calcYoYGrowth = (reports: Report[]) => {
         const lastYearReport = reports.find(
           (x) => x.fp === currentReport.fp && x.fy === currentReport.fy - 1
         )
-
         if (!lastYearReport) return data
         const percentYoY = calcPercentGrowth(lastYearReport, currentReport)
         return {
@@ -55,4 +53,11 @@ export const calcYoYGrowth = (reports: Report[]) => {
     return toPercentFormat(allData.totalPercent / allData.quarters)
   }
   return null
+}
+
+export const calcPercentGrowth = (prev: Report, curr: Report) => {
+  if (!prev.val || !curr.val) {
+    return 0
+  }
+  return ((curr.val - prev.val) / Math.abs(prev.val)) * 100
 }

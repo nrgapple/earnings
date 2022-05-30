@@ -21,10 +21,27 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       ...(search
         ? {
             where: {
-              ticker: (search as string).toUpperCase(),
+              AND: [
+                {
+                  reports: {
+                    some: {},
+                  },
+                },
+                { ticker: (search as string).toUpperCase() },
+              ],
             },
           }
-        : {}),
+        : {
+            where: {
+              AND: [
+                {
+                  reports: {
+                    some: {},
+                  },
+                },
+              ],
+            },
+          }),
     })
     const numPages = Math.floor(companyCount / count)
     const p = page ? Number(page as string) : 0
@@ -61,7 +78,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       include: {
         reports: true,
       },
-    })) as DBCompany[]
+    })) as unknown as DBCompany[]
 
     if (!Array.isArray(dbCompanies)) {
       throw new Error('Cannot find data')
