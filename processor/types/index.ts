@@ -56,6 +56,7 @@ export interface ReportPretty {
   start?: string
   end: string
   filed?: string
+  form?: string
   frame?: string
   accn?: string
   endMonths?: number

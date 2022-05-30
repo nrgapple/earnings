@@ -52,7 +52,7 @@ const uploadToPrisma = async (company: EarningsMetric) => {
     skipDuplicates: true,
     data: Object.entries(company.metrics).flatMap(([tag, reports]) => {
       return reports.map((report) => {
-        const { fp, fy, val, end, start } = report
+        const { fp, fy, val, end, start, accn } = report
         return {
           fp,
           fy,
@@ -60,6 +60,7 @@ const uploadToPrisma = async (company: EarningsMetric) => {
           start: start ? new Date(start) : undefined,
           val,
           tag,
+          accn,
           companyTicker: company.ticker,
         } as Prisma.ReportCreateManyInput
       })
@@ -72,19 +73,19 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
   let i = 0
   for await (const companyChunk of companyChunks) {
     i++
-    // await prisma.company.createMany({
-    //   skipDuplicates: true,
-    //   data: companyChunk.map((x) => ({
-    //     ticker: x.ticker,
-    //   })),
-    // })
+    await prisma.company.createMany({
+      skipDuplicates: true,
+      data: companyChunk.map((x) => ({
+        ticker: x.ticker,
+      })),
+    })
     const earnings = await getCompaniesByChunk(companyChunk)
     const domesticEarnings = getDomesticCompanies(earnings)
     const companiesCleaned = cleanEarningsData([domesticEarnings[0]])
-    // await prisma.report.deleteMany({})
+    await prisma.report.deleteMany({})
     console.log(`loading chunk: ${i}, length: ${companiesCleaned.length}`)
     for await (const cleaned of companiesCleaned) {
-      // await uploadToPrisma(cleaned)
+      await uploadToPrisma(cleaned)
     }
     break
   }

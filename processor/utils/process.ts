@@ -71,9 +71,10 @@ const cleanCompanyEarnings = (earning: Earnings) => {
           }))
           .filter(
             (report) =>
-              report.endMonths === undefined ||
-              report.endMonths === 3 ||
-              report.endMonths === 12
+              (report.endMonths === undefined ||
+                report.endMonths === 3 ||
+                report.endMonths === 12) &&
+              (report.form === '10-Q' || report.form === '10-K')
           )
         const reportsByFiled = groupBy(allYTDReports, (report) => report.filed)
         const reportsForFilingPeriod = sortReports(

@@ -21,6 +21,7 @@ model Report {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?
   val           Float?
+  accn          String?
   end           DateTime
   start         DateTime?
   fp            String

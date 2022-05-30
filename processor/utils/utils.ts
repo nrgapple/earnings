@@ -236,26 +236,28 @@ export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
   const reportsByPeriod = Object.values(
     groupBy(reports, (report) => report.fp)
   ).flat()
+
   if (reportsByPeriod.length === 4) {
-    return reportsByPeriod.reduce(
-      (prevData, currentReport) => {
-        if (prevData.reports.length === 0) {
-          prevData.reports.push(currentReport)
-          prevData.prevRevenue = currentReport.val!
-        } else {
-          const currentRevenue = currentReport.val! - prevData.prevRevenue
-          const prevReport = prevData.reports[prevData.reports.length - 1]
-          prevData.reports.push({
-            ...currentReport,
-            val: currentRevenue,
-            start: prevReport.end,
-            fp: currentReport.fp === 'FY' ? 'Q4' : currentReport.fp,
-          })
-        }
-        return prevData
-      },
-      { reports: [] as ReportPretty[], prevRevenue: 0 }
-    ).reports
+    const fullYearReport = reportsByPeriod.find((x) => x.endMonths === 12)
+    if (fullYearReport) {
+      const nineMonthReports = reportsByPeriod.filter(
+        (report) => report.endMonths === 3
+      )
+      const nineMonthRevenue = nineMonthReports.reduce(
+        (acc, curr) => (acc += curr.val!),
+        0
+      )
+      return [
+        ...nineMonthReports,
+        {
+          ...fullYearReport,
+          fp: 'Q4',
+          val: fullYearReport.val! - nineMonthRevenue,
+        } as ReportPretty,
+      ]
+    }
+
+    return reports
   }
   return reports
 }
