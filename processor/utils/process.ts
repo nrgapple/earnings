@@ -1,4 +1,4 @@
-import { config } from '../config/config'
+import { config, ratios } from '../config/config'
 import {
   EarningsMetric,
   TagsKey,
@@ -56,7 +56,7 @@ const cleanCompanyEarnings = (earning: Earnings) => {
     .filter((x) => x.value)
   const earningMap = objArrToObj<string, ReportPretty[]>(earningMapArr)
   const parsedMetrics = load({ ticker: earning.ticker, metrics: earningMap })
-  return {
+  const cleanedEarnings = {
     ...parsedMetrics,
     metrics: Object.entries(parsedMetrics.metrics)
       .filter((x) => x[1] && x[1].length > 0)
@@ -87,6 +87,39 @@ const cleanCompanyEarnings = (earning: Earnings) => {
         return record
       }, {} as Record<string, ReportPretty[]>),
   } as EarningsMetric
+
+  Object.entries(ratios).forEach(([tag, meta]) => {
+    const first = meta.tags[0]
+    const second = meta.tags[1]
+    if (!cleanedEarnings.metrics[first] || !cleanedEarnings.metrics[second])
+      return
+    const reportsByEnd = groupBy(
+      [
+        ...Object.values(cleanedEarnings.metrics[first]).map((report) => {
+          return {
+            ...report,
+            tag: first,
+          }
+        }),
+        ...Object.values(cleanedEarnings.metrics[second]).map((report) => {
+          return {
+            ...report,
+            tag: second,
+          }
+        }),
+      ],
+      (report) => report.end
+    )
+    const ratio = Object.values(reportsByEnd)
+      .map((reports) => {
+        if (reports.length === 2) {
+          return meta.callback(reports[0], reports[1])
+        }
+      })
+      .filter((x) => x) as ReportPretty[]
+    cleanedEarnings.metrics[tag] = ratio
+  })
+  return cleanedEarnings
 }
 
 /**

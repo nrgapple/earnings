@@ -1067,11 +1067,36 @@ export const load = (earning: EarningsMetric) => {
   //   }
   // }
 
-  // tags['ROA'] = getCalculateTag(tags['NetIncomeLoss'], tags['Assets'], '/')
+  // if (tags['NetIncomeLoss'] && tags['Assets']) {
+  //   tags['ReturnOnAssets'] = getCalculateTag(
+  //     tags['NetIncomeLoss'],
+  //     tags['Assets'],
+  //     '/'
+  //   )
+  // }
 
-  // tags['ROE'] = getCalculateTag(tags['NetIncomeLoss'], tags['Equity'], '/')
+  // if (tags['NetIncomeLoss'] && tags['Equity']) {
+  //   tags['ReturnOnEquity'] = getCalculateTag(
+  //     tags['NetIncomeLoss'],
+  //     tags['Equity'],
+  //     '/'
+  //   )
+  // }
 
-  // tags['ROS'] = getCalculateTag(tags['NetIncomeLoss'], tags['Revenues'], '/')
+  // if (tags['NetCashFlowsOperating'] && tags['Equity']) {
+  //   tags['ReturnOnOperations'] = getCalculateTag(
+  //     tags['NetCashFlowsOperating'],
+  //     tags['Equity'],
+  //     '/'
+  //   )
+  // }
+  // if (tags['NetIncomeLoss'] && tags['Revenues']) {
+  //   tags['ReturnOnSales'] = getCalculateTag(
+  //     tags['NetIncomeLoss'],
+  //     tags['Revenues'],
+  //     '/'
+  //   )
+  // }
   return {
     ticker: earning.ticker,
     metrics: tags,
