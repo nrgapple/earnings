@@ -81,13 +81,15 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
     })
     const earnings = await getCompaniesByChunk(companyChunk)
     const domesticEarnings = getDomesticCompanies(earnings)
-    const companiesCleaned = cleanEarningsData([domesticEarnings[0]])
-    await prisma.report.deleteMany({})
+    const companiesCleaned = cleanEarningsData(domesticEarnings)
+    // await prisma.report.deleteMany({})
     console.log(`loading chunk: ${i}, length: ${companiesCleaned.length}`)
     for await (const cleaned of companiesCleaned) {
       await uploadToPrisma(cleaned)
     }
-    break
+    if (i === 10) {
+      break
+    }
   }
 }
 

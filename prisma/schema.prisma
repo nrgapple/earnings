@@ -27,6 +27,7 @@ model Report {
   fp            String
   fy            Int
   tag           String
+  score         Int?
   Company       Company?  @relation(fields: [companyTicker], references: [ticker])
   companyTicker String?
 
