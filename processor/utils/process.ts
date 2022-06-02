@@ -110,10 +110,49 @@ const cleanCompanyEarnings = (earning: Earnings) => {
       ],
       (report) => report.end
     )
+    const allReports = Object.values(reportsByEnd).flat()
     const ratio = Object.values(reportsByEnd)
       .map((reports) => {
         if (reports.length === 2) {
-          return meta.callback(reports[0], reports[1])
+          const firstReport = reports[0]
+          const secondReport = reports[1]
+          if (!firstReport && !secondReport) return undefined
+          const ttmFirst = allReports.filter((x) => {
+            const monthsBetween = getMonthsEnd(firstReport.end, x.end)
+            return (
+              monthsBetween &&
+              monthsBetween < 10 &&
+              firstReport.tag === x.tag &&
+              monthsBetween > 0
+            )
+          })
+          let prevSecondVals = 0
+          if (secondReport.tag === 'Revenues') {
+            const ttmSecond = allReports.filter((x) => {
+              const monthsBetween = getMonthsEnd(secondReport.end, x.end)
+              return (
+                monthsBetween &&
+                monthsBetween < 10 &&
+                secondReport.tag === x.tag &&
+                monthsBetween > 0
+              )
+            })
+            if (ttmSecond.length !== 3) return
+            prevSecondVals = ttmSecond.reduce(
+              (prev, acc) => (prev += acc.val!),
+              0
+            )
+          }
+          if (ttmFirst.length !== 3) return undefined
+          const prevVals = ttmFirst.reduce((prev, acc) => (prev += acc.val!), 0)
+
+          return meta.callback(
+            {
+              ...firstReport,
+              val: firstReport.val! + prevVals,
+            },
+            { ...secondReport, val: secondReport.val! + prevSecondVals }
+          )
         }
       })
       .filter((x) => x) as ReportPretty[]

@@ -247,8 +247,10 @@ export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
           ...quarterlyReports,
           {
             ...fullYearReport,
+            start: quarterlyReports[2].end,
             fp: 'Q4',
             val: fullYearReport.val! - nineMonthRevenue,
+            endMonths: 3,
           } as ReportPretty,
         ]
       }

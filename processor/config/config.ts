@@ -1,57 +1,31 @@
 import { ReportPretty } from '../types'
 
+const callback = (first: ReportPretty, second: ReportPretty) => {
+  return {
+    start: first.start,
+    end: first.end,
+    val: first.val! / second.val!,
+    fp: first.fp,
+    fy: first.fy,
+  } as ReportPretty
+}
+
 export const ratios = {
   ReturnOnAssets: {
     tags: ['NetIncomeLoss', 'Assets'] as const,
-    callback: (netIncomeReport: ReportPretty, assetReport: ReportPretty) => {
-      if (!netIncomeReport || !assetReport) return undefined
-      return {
-        start: netIncomeReport.start,
-        end: netIncomeReport.end,
-        val: netIncomeReport.val! / assetReport.val!,
-        fp: netIncomeReport.fp,
-        fy: netIncomeReport.fy,
-      } as ReportPretty
-    },
+    callback,
   },
   ReturnOnEquity: {
     tags: ['NetIncomeLoss', 'Equity'] as const,
-    callback: (netIncomeReport: ReportPretty, equityReport: ReportPretty) => {
-      if (!netIncomeReport || !equityReport) return undefined
-      return {
-        start: netIncomeReport.start,
-        end: netIncomeReport.end,
-        val: netIncomeReport.val! / equityReport.val!,
-        fp: netIncomeReport.fp,
-        fy: netIncomeReport.fy,
-      } as ReportPretty
-    },
+    callback,
   },
   ReturnOnOperations: {
     tags: ['NetCashFlowsOperating', 'Equity'] as const,
-    callback: (operationReport: ReportPretty, equityReport: ReportPretty) => {
-      if (!operationReport || !equityReport) return undefined
-      return {
-        start: operationReport.start,
-        end: operationReport.end,
-        val: operationReport.val! / equityReport.val!,
-        fp: operationReport.fp,
-        fy: operationReport.fy,
-      } as ReportPretty
-    },
+    callback,
   },
   ReturnOnSales: {
     tags: ['NetIncomeLoss', 'Revenues'] as const,
-    callback: (netIncomeReport: ReportPretty, revenueReport: ReportPretty) => {
-      if (!netIncomeReport || !revenueReport) return undefined
-      return {
-        start: netIncomeReport.start,
-        end: netIncomeReport.end,
-        val: netIncomeReport.val! / revenueReport.val!,
-        fp: netIncomeReport.fp,
-        fy: netIncomeReport.fy,
-      } as ReportPretty
-    },
+    callback,
   },
 } as const
 

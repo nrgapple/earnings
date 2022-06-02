@@ -104,34 +104,35 @@ const main = async () => {
     const earings = await getEarnings(filePath)
     const domesticEarnings = getDomesticCompanies(earings)
 
-    const companiesCleaned = cleanEarningsData(domesticEarnings)
-    await prisma.company.createMany({
-      data: companiesCleaned.map(
-        (x) =>
-          ({
-            ticker: x.ticker,
-          } as Prisma.CompanyCreateManyInput)
-      ),
-    })
-    await prisma.report.deleteMany({})
+    const companiesCleaned = cleanEarningsData([domesticEarnings[0]])
+    // await prisma.company.createMany({
+    //   data: companiesCleaned.map(
+    //     (x) =>
+    //       ({
+    //         ticker: x.ticker,
+    //       } as Prisma.CompanyCreateManyInput)
+    //   ),
+    // })
+    // await prisma.report.deleteMany({})
     for await (const company of companiesCleaned) {
+      break
       console.log('doing company: ', company.ticker)
-      await prisma.report.createMany({
-        data: Object.entries(company.metrics).flatMap(([tag, reports]) => {
-          return reports.map((report) => {
-            const { fp, fy, val, end, start } = report
-            return {
-              fp,
-              fy,
-              end: new Date(end),
-              start: start ? new Date(start) : undefined,
-              val,
-              tag,
-              companyTicker: company.ticker,
-            } as Prisma.ReportCreateManyInput
-          })
-        }),
-      })
+      // await prisma.report.createMany({
+      //   data: Object.entries(company.metrics).flatMap(([tag, reports]) => {
+      //     return reports.map((report) => {
+      //       const { fp, fy, val, end, start } = report
+      //       return {
+      //         fp,
+      //         fy,
+      //         end: new Date(end),
+      //         start: start ? new Date(start) : undefined,
+      //         val,
+      //         tag,
+      //         companyTicker: company.ticker,
+      //       } as Prisma.ReportCreateManyInput
+      //     })
+      //   }),
+      // })
     }
   } catch (e) {
     errorsCache.push(e)
