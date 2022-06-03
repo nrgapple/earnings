@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import {
   CartesianGrid,
   DotProps,
@@ -27,7 +26,7 @@ export const TagGraph = (props: TagGraphProps) => {
   const [currDot, setCurrDot] = dot
 
   return (
-    <ResponsiveContainer width="100%" height={600} debounce={200}>
+    <ResponsiveContainer width="100%" height={'100%'} debounce={200}>
       <LineChart
         data={data}
         margin={{ top: 20, right: 5, bottom: 5, left: 20 }}
@@ -52,7 +51,7 @@ export const TagGraph = (props: TagGraphProps) => {
         <Tooltip
           itemStyle={{ height: '1px' }}
           labelFormatter={labelFormatter}
-          formatter={priceFormatter}
+          // formatter={priceFormatter}
           allowEscapeViewBox={{ y: true }}
           content={(props: TooltipProps<number, number>) => (
             <CustomTooltip {...props} dot={currDot} />
@@ -62,7 +61,7 @@ export const TagGraph = (props: TagGraphProps) => {
         <YAxis
           scale={'sqrt'}
           //interval={0}
-          tickFormatter={priceFormatter}
+          // tickFormatter={priceFormatter}
         />
         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
       </LineChart>
@@ -91,7 +90,7 @@ const CustomTooltip = ({
             </Text>
           </Grid>
           <Grid>
-            <Text>{priceFormatter(dot['value'])}</Text>
+            <Text>{Math.round(dot['value'] * 100) / 100}</Text>
           </Grid>
         </Grid.Container>
       </Card>

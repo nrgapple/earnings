@@ -1,13 +1,12 @@
 import useSWR from 'swr'
 import { Grid, Loading, Pagination, Text } from '@nextui-org/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { CompaniesResp } from '../interfaces'
 import Layout from '../components/Layout'
-import { useRouter } from 'next/router'
-import { Graph } from '../components/Graph'
+import { GraphList } from '../components/GraphList'
 
 // @ts-ignore
-const fetcher = async (...args) => {
+export const fetcher = async (...args) => {
   // @ts-ignore
   const resp = await fetch(...args)
   const data = await resp.json()
@@ -15,24 +14,13 @@ const fetcher = async (...args) => {
 }
 
 const Home = () => {
-  const { query } = useRouter()
   const [pageNumber, setPageNumber] = useState(1)
-  const [search, setSearch] = useState<string>()
   const url = useMemo(
-    () =>
-      `/api/earnings?page=${pageNumber - 1}${
-        search ? `&search=${search}` : ''
-      }`,
-    [search, pageNumber]
+    () => `/api/earnings?page=${pageNumber - 1}`,
+    [pageNumber]
   )
   const { data, error } = useSWR<CompaniesResp, Error>(url, fetcher)
   const loading = !data && !error
-
-  useEffect(() => {
-    if (query?.ticker) {
-      setSearch(query.ticker as string)
-    }
-  }, [query])
 
   return (
     <Layout>
@@ -44,10 +32,10 @@ const Home = () => {
         ) : error ? (
           <Text h4>There was an error: {error.message}</Text>
         ) : (
-          <Grid.Container justify="center" gap={2} direction="column">
-            {data && <Graph companies={data.companies} />}
+          <Grid.Container gap={2}>
+            {data && <GraphList companies={data.companies} />}
             {data && data.companies?.length && (
-              <Grid xs justify="center">
+              <Grid xs={12} justify="center">
                 <Pagination
                   total={data.pages + 1}
                   page={pageNumber}

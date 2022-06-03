@@ -1,6 +1,4 @@
 export const CompanyMetrics = {
-  stock: ['Market Cap'],
-  ratios: ['Free Cashflow Margin', 'Operating Margin'],
   income: [
     { tag: ['Revenues'], name: 'Revenue YoY Growth' },
     {

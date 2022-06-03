@@ -3,7 +3,7 @@ import { Company, CompaniesResp, DBCompany } from '../../../interfaces'
 import prisma from '../../../lib/prisma'
 import { groupBy } from '../../../processor/utils'
 
-const count = 5
+const count = 20
 
 /**
  * @swagger
