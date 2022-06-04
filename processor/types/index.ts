@@ -1,4 +1,15 @@
-import { Weights } from '../config/config'
+export interface FilingResp {
+  name: string
+  tickers: string[]
+  exchanges: string[]
+  filings: {
+    recent: {
+      accessionNumber: string[]
+      form: string[]
+      primaryDocument: string[]
+    }
+  }
+}
 
 export interface ReportResp {
   cik: number
@@ -16,6 +27,10 @@ export type TagsKey = Extract<keyof TagsObject, string>
 export interface Earnings {
   ticker: string
   tags: TagsObject
+  accns?: {
+    name: string
+    link: string
+  }[]
 }
 
 export interface EarningsMetric {
@@ -59,6 +74,7 @@ export interface ReportPretty {
   form?: string
   frame?: string
   accn?: string
+  link?: string
   endMonths?: number
 }
 

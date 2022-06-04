@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { CalendarEarnings, ReportResp, TickerInfo } from '../types'
+import { CalendarEarnings, FilingResp, ReportResp, TickerInfo } from '../types'
 import { errorsCache } from '../utils/utils'
 
 /**
@@ -75,6 +75,22 @@ export const getCompanyReport = async (cik: string) => {
     )
 
     return (await report.json()) as ReportResp
+  } catch (e) {
+    errorsCache.push(e)
+    return undefined
+  }
+}
+
+export const getCompanyFilings = async (cik: string) => {
+  try {
+    const report = await fetch(`https://data.sec.gov/submissions/${cik}.json`, {
+      headers: {
+        Accept: 'application/json',
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36',
+      },
+    })
+    return (await report.json()) as FilingResp
   } catch (e) {
     errorsCache.push(e)
     return undefined

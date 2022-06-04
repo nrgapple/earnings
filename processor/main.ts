@@ -10,6 +10,7 @@ import { cleanEarningsData } from './utils/process'
 import { Earnings, EarningsMetric, ReportResp, TickerInfo } from './types'
 import { errorsCache, getChunks, getDomesticCompanies } from './utils'
 import prisma from '../lib/prisma'
+import { getCompanyFilings } from './data'
 require('dotenv').config()
 
 const getEarnings = async (filePath: string) => {
@@ -27,15 +28,31 @@ const getCompaniesByChunk = async (companies: TickerInfo[]) => {
   return (
     await Promise.all(
       companies.map(async (company) => {
-        const fileName = `${
-          config.filePath
-        }/companyfacts/CIK${`${company.cik_str}`.padStart(10, '0')}.json`
+        const fullCik = `CIK${`${company.cik_str}`.padStart(10, '0')}`
+        const filings = await getCompanyFilings(fullCik)
+        const allForms = filings?.filings.recent.form
+          .map((x, i) => (x === '10-Q' || x === '10-K' ? i : undefined))
+          .filter((x) => x) as number[]
+        const accnToAdd = allForms?.map((idx) => {
+          const accn = filings?.filings.recent.accessionNumber[idx]
+          const document = filings?.filings.recent.primaryDocument[idx]
+          const link = `${fullCik.replace('CIK', '')}/${accn
+            ?.split('-')
+            .join('')}/${document}`
+          return {
+            name: accn,
+            link,
+          }
+        }) as { name: string; link: string }[]
+
+        const fileName = `${config.filePath}/companyfacts/${fullCik}.json`
         if (hasCache(fileName)) {
           const data = (await getCachedEarnings(fileName)) as ReportResp
           if (data.facts) {
             return {
               ticker: company.ticker,
               tags: data.facts['us-gaap'],
+              accns: accnToAdd,
             } as Earnings
           }
         }
@@ -52,7 +69,7 @@ const uploadToPrisma = async (company: EarningsMetric) => {
     skipDuplicates: true,
     data: Object.entries(company.metrics).flatMap(([tag, reports]) => {
       return reports.map((report) => {
-        const { fp, fy, val, end, start, accn } = report
+        const { fp, fy, val, end, start, accn, link } = report
         return {
           fp,
           fy,
@@ -62,6 +79,7 @@ const uploadToPrisma = async (company: EarningsMetric) => {
           tag,
           accn,
           companyTicker: company.ticker,
+          secLink: link,
         } as Prisma.ReportCreateManyInput
       })
     }),
@@ -73,16 +91,16 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
   let i = 0
   for await (const companyChunk of companyChunks) {
     i++
-    await prisma.company.createMany({
-      skipDuplicates: true,
-      data: companyChunk.map((x) => ({
-        ticker: x.ticker,
-      })),
-    })
-    const earnings = await getCompaniesByChunk(companyChunk)
+    // await prisma.company.createMany({
+    //   skipDuplicates: true,
+    //   data: companyChunk.map((x) => ({
+    //     ticker: x.ticker,
+    //   })),
+    // })
+    const earnings = await getCompaniesByChunk([companyChunk[0]])
     const domesticEarnings = getDomesticCompanies(earnings)
     const companiesCleaned = cleanEarningsData(domesticEarnings)
-    // await prisma.report.deleteMany({})
+    await prisma.report.deleteMany({})
     console.log(`loading chunk: ${i}, length: ${companiesCleaned.length}`)
     for await (const cleaned of companiesCleaned) {
       await uploadToPrisma(cleaned)
@@ -90,6 +108,7 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
     if (i === 10) {
       break
     }
+    break
   }
 }
 

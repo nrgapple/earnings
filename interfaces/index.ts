@@ -24,6 +24,7 @@ export interface Report {
   frame?: string
   tag: string
   accn?: string
+  secLink?: string
 }
 
 export interface CompanyProfile {

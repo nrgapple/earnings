@@ -61,15 +61,23 @@ const cleanCompanyEarnings = (earning: Earnings) => {
     metrics: Object.entries(parsedMetrics.metrics)
       .filter((x) => x[1] && x[1].length > 0)
       .reduce((record, [tag, reports]) => {
-        // group all reports by the account number
         const allYTDReports = reports
-          .map((report) => ({
-            ...report,
-            endMonths:
-              Math.round(getMonthsEnd(report.end, report.start) ?? 0) ||
-              undefined,
-          }))
-          .filter((report) => report.form === '10-Q' || report.form === '10-K')
+          .filter(
+            (report) =>
+              !!earning.accns?.find((accn) => accn.name === report.accn!)
+          )
+          .map((report) => {
+            const accn = earning.accns?.find(
+              (accn) => accn.name === report.accn
+            )
+            return {
+              ...report,
+              endMonths:
+                Math.round(getMonthsEnd(report.end, report.start) ?? 0) ||
+                undefined,
+              link: accn ? accn.link : undefined,
+            }
+          })
         const reportsByFiled = groupBy(allYTDReports, (report) => report.filed)
         const reportsForFilingPeriod = sortReports(
           Object.values(reportsByFiled).flatMap(

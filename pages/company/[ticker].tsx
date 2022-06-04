@@ -18,16 +18,11 @@ const CompanyPage = () => {
     if (data?.companies.length > 0) {
       const company = data.companies[0]
       return company.tags['Assets'].map((x) => {
-        const accn = x.accn.split('-')
-        const end = x.end.split('-').join('').split('T')[0]
-        const cik = accn[0]
         return (
           <Grid justify="center" xs={2}>
             <Link
               target={'_blank'}
-              href={`https://www.sec.gov/ix?doc=/Archives/edgar/data/${cik}/${accn.join(
-                ''
-              )}/${company.ticker.toLowerCase()}-${end}.htm`}
+              href={`https://www.sec.gov/ix?doc=/Archives/edgar/data/${x.secLink}`}
             >{`${x.fp}-${x.fy}`}</Link>
           </Grid>
         )

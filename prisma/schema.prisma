@@ -27,6 +27,7 @@ model Report {
   fp            String
   fy            Int
   tag           String
+  secLink       String?
   Company       Company?  @relation(fields: [companyTicker], references: [ticker])
   companyTicker String?
 
