@@ -1,5 +1,18 @@
 import { Report } from '../interfaces'
 
+export const groupBy = <T>(arr: T[], func: (v: T) => string | undefined) => {
+  return arr.reduce((prev, curr) => {
+    const key = func(curr)
+    if (!key) {
+      return prev
+    }
+    return {
+      ...prev,
+      [key]: [...(prev[key] ?? []), curr],
+    }
+  }, {} as Record<string, T[]>)
+}
+
 export const objArrToObj = <T extends string, TV extends unknown>(
   arr: {
     key: T

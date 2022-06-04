@@ -23,6 +23,7 @@ export interface Report {
   filed?: string
   frame?: string
   tag: string
+  accn?: string
 }
 
 export interface CompanyProfile {
