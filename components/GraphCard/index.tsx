@@ -1,4 +1,4 @@
-import { Card, Divider, Grid, Text } from '@nextui-org/react'
+import { Card, Divider, Grid, Link, Text } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
 import Select, { MultiValue } from 'react-select'
 import { CompanyMetrics } from '../../constants'
@@ -43,35 +43,39 @@ export const GraphCard = ({
 
   return (
     <Card>
-      <Card.Header>
-        <Grid.Container>
+      <Card.Header css={{ flexDirection: 'column' }}>
+        <Grid.Container
+          as={Link}
+          href={`/company/${company.ticker.toLowerCase()}`}
+          css={{ cursor: 'pointer' }}
+        >
           <Grid dir="column" xs={12}>
             <Text h3>{company.ticker}</Text>
           </Grid>
           <Grid xs={12}>
             <Text>{company.name}</Text>
           </Grid>
-          <Divider css={{ mb: '$8' }} />
-          <Grid.Container>
-            {Object.entries(CompanyMetrics).map(([row, data]) =>
-              data.map((x) => (
-                <>
-                  <Grid alignItems="center" xs={3}>
-                    <Text size={'12px'} weight={'bold'}>
-                      {x.name}:
-                    </Text>
-                  </Grid>
-                  <Grid xs={9}>
-                    <Text css={{ pl: '$3' }}>
-                      {calcYoYGrowth(
-                        company.tags[x.tag?.find((x) => company.tags[x])]
-                      )}
-                    </Text>
-                  </Grid>
-                </>
-              ))
-            )}
-          </Grid.Container>
+        </Grid.Container>
+        <Divider />
+        <Grid.Container>
+          {Object.entries(CompanyMetrics).map(([row, data]) =>
+            data.map((x) => (
+              <>
+                <Grid alignItems="center" xs={3}>
+                  <Text size={'12px'} weight={'bold'}>
+                    {x.name}:
+                  </Text>
+                </Grid>
+                <Grid xs={9}>
+                  <Text css={{ pl: '$3' }}>
+                    {calcYoYGrowth(
+                      company.tags[x.tag?.find((x) => company.tags[x])]
+                    )}
+                  </Text>
+                </Grid>
+              </>
+            ))
+          )}
         </Grid.Container>
       </Card.Header>
       <Divider />
