@@ -65,7 +65,7 @@ export const GraphCard = ({
                 <Grid xs={9}>
                   <Text css={{ pl: '$3' }}>
                     {calcYoYGrowth(
-                      company.tags[x.tag?.find((x) => company.tags[x])]
+                      company.tags[x.tag.find((x) => company.tags[x])]
                     )}
                   </Text>
                 </Grid>

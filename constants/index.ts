@@ -10,4 +10,4 @@ export const CompanyMetrics = {
       name: 'Operating Cashflow Increasing',
     },
   ],
-} as const
+}
