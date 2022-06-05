@@ -15,10 +15,20 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     const { search } = _req.query
     const results = await prisma.company.findMany({
       where: {
-        ticker: {
-          startsWith: search as string,
-          mode: 'insensitive',
-        },
+        OR: [
+          {
+            ticker: {
+              startsWith: search as string,
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              startsWith: search as string,
+              mode: 'insensitive',
+            },
+          },
+        ],
       },
       take: 5,
       select: {

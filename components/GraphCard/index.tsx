@@ -1,4 +1,4 @@
-import { Card, Divider, Grid, Link, Text } from '@nextui-org/react'
+import { Card, Divider, Grid, Text } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
 import Select, { MultiValue } from 'react-select'
 import { CompanyMetrics } from '../../constants'
@@ -43,20 +43,16 @@ export const GraphCard = ({
 
   return (
     <Card>
-      <Card.Header css={{ flexDirection: 'column' }}>
-        <Grid.Container
-          as={Link}
-          href={`/company/${company.ticker.toLowerCase()}`}
-          css={{ cursor: 'pointer' }}
-        >
-          <Grid dir="column" xs={12}>
-            <Text h3>{company.ticker}</Text>
-          </Grid>
-          <Grid xs={12}>
-            <Text>{company.name}</Text>
-          </Grid>
-        </Grid.Container>
-        <Divider />
+      <Card.Header>
+        <Grid dir="column" xs={12}>
+          <Text h3>{company.ticker}</Text>
+        </Grid>
+        <Grid xs={12}>
+          <Text>{company.name}</Text>
+        </Grid>
+      </Card.Header>
+      <Divider />
+      <Card.Body css={{ height }}>
         <Grid.Container>
           {Object.entries(CompanyMetrics).map(([row, data]) =>
             data.map((x) => (
@@ -77,9 +73,6 @@ export const GraphCard = ({
             ))
           )}
         </Grid.Container>
-      </Card.Header>
-      <Divider />
-      <Card.Body css={{ height }}>
         {showFilters && (
           <Select
             defaultValue={selectedTags}
