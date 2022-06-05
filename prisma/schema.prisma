@@ -11,6 +11,7 @@ generator client {
 model Company {
   ticker    String    @id
   id        String    @unique @default(uuid())
+  name      String?
   createdAt DateTime  @default(now())
   updatedAt DateTime?
   reports   Report[]

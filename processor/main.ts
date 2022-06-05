@@ -90,13 +90,17 @@ const getEarningsFromZip = async (companies: TickerInfo[]) => {
   const companyChunks = getChunks(companies, 100) as TickerInfo[][]
   let i = 0
   for await (const companyChunk of companyChunks) {
+    console.log({ title: companyChunk[0].title })
+
     i++
-    // await prisma.company.createMany({
-    //   skipDuplicates: true,
-    //   data: companyChunk.map((x) => ({
-    //     ticker: x.ticker,
-    //   })),
-    // })
+    await prisma.company.deleteMany({})
+    await prisma.company.createMany({
+      skipDuplicates: true,
+      data: companyChunk.map((x) => ({
+        ticker: x.ticker,
+        name: x.title,
+      })),
+    })
     const earnings = await getCompaniesByChunk([companyChunk[0]])
     const domesticEarnings = getDomesticCompanies(earnings)
     const companiesCleaned = cleanEarningsData(domesticEarnings)

@@ -2,12 +2,14 @@ import { CompanyMetrics } from '../constants'
 
 export interface Company {
   ticker: string
+  name?: string
   id: string
   tags: Record<string, Report[]>
 }
 
 export interface DBCompany {
   ticker: string
+  name?: string
   id: string
   reports: Report[]
 }

@@ -88,6 +88,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       (c) =>
         ({
           ticker: c.ticker,
+          name: c.name,
           tags: groupBy(c.reports, (v) => v.tag),
         } as Company)
     )

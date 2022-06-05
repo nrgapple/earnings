@@ -42,6 +42,7 @@ export const getAllCompanyData = async () => {
     (data) =>
       ({
         ticker: data.ticker,
+        title: data.title,
         cik_str: `${data.cik_str}`.padStart(10, '0'),
       } as TickerInfo)
   )

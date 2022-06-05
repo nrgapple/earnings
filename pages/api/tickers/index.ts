@@ -23,6 +23,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       take: 5,
       select: {
         ticker: true,
+        name: true,
       },
     })
     return res.json(results)
