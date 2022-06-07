@@ -1,5 +1,14 @@
 import { CompanyMetrics } from '../constants'
 
+export interface FullIndexYear {
+  directory: {
+    item: {
+      'last-modified': Date
+      name: string
+    }[]
+  }
+}
+
 export interface Company {
   ticker: string
   name?: string
