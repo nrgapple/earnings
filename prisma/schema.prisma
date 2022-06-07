@@ -8,6 +8,11 @@ generator client {
   previewFeatures = ["interactiveTransactions", "fullTextSearch"]
 }
 
+model LatestFiling {
+  id String @id @default(uuid())
+  latestDate  DateTime @unique
+}
+
 model Company {
   ticker    String    @id
   id        String    @unique @default(uuid())
