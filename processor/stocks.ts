@@ -37,8 +37,8 @@ const getCompaniesEarningsByChunks = async (
   return reports
 }
 
-export const getAllCompanyData = async () => {
-  return Object.values(await getCompanyTickers()).map(
+export const getAllCompanyData = async (filteredCiks?: string[]) => {
+  const allCompanies = Object.values(await getCompanyTickers()).map(
     (data) =>
       ({
         ticker: data.ticker,
@@ -46,6 +46,10 @@ export const getAllCompanyData = async () => {
         cik_str: `${data.cik_str}`.padStart(10, '0'),
       } as TickerInfo)
   )
+
+  return filteredCiks
+    ? allCompanies.filter((x) => filteredCiks.includes(x.cik_str as string))
+    : allCompanies
 }
 
 /**

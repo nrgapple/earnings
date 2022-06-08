@@ -88,6 +88,10 @@ const cleanCompanyEarnings = (earning: Earnings) => {
         const reportsByYear = groupBy(reportsForFilingPeriod, (report) =>
           report.fy.toString()
         )
+        if (tag === 'Revenues') {
+          console.log(reportsByYear)
+        }
+
         const reportsWithQ4 = Object.values(reportsByYear).flatMap(
           calculateYtdToQuarter
         )

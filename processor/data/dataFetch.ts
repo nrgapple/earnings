@@ -61,7 +61,7 @@ export const getCompanyTickers = async (): Promise<{
 export const getCompanyReport = async (cik: string) => {
   try {
     const report = await fetch(
-      `https://data.sec.gov/api/xbrl/companyfacts/CIK${cik.padStart(
+      `https://data.sec.gov/api/xbrl/companyfacts/${cik.padStart(
         10,
         '0'
       )}.json`,
@@ -76,7 +76,7 @@ export const getCompanyReport = async (cik: string) => {
 
     return (await report.json()) as ReportResp
   } catch (e) {
-    errorsCache.push(e)
+    console.log(e)
     return undefined
   }
 }
