@@ -76,6 +76,7 @@ export interface ReportPretty {
   accn?: string
   link?: string
   endMonths?: number
+  ttm?: number
 }
 
 export interface CompanyProfile {

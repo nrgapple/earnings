@@ -39,6 +39,6 @@ model Report {
   Company       Company?  @relation(fields: [companyTicker], references: [ticker])
   companyTicker String?
 
-  @@unique([fy, fp, tag, companyTicker])
+  @@unique([start, end, tag, companyTicker])
   @@index([tag])
 }

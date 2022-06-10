@@ -6,7 +6,7 @@ export const errorsCache = [] as unknown[]
 
 export const growthValues = [] as unknown[]
 
-export const getMonthsEnd = (end: string, start?: string) => {
+export const getMonthsBetween = (end: string, start?: string) => {
   if (!start) return undefined
   return moment(end).diff(moment(start), 'months', true)
 }
@@ -129,200 +129,60 @@ export const objArrToObj = <T extends string, TV extends unknown>(
   return result
 }
 
-export const getQuarterFromMonth = (endMonth: number) => {
-  if (endMonth > 2 && endMonth < 5) {
-    return 'Q1'
-  } else if (endMonth > 5 && endMonth < 8) {
-    return 'Q2'
-  } else if (endMonth > 8 && endMonth < 11) {
-    return 'Q3'
-  } else {
-    return 'Q4'
-  }
-}
-
-export const getFiscalYearQs = (
-  year: number,
-  missingQ: 'Q1' | 'Q2' | 'Q3' | 'Q4'
-) => {
-  let fp
-  let fy
-  switch (missingQ) {
-    case 'Q1':
-      return [
-        {
-          fp: 'Q4',
-          fy: year - 1,
-        },
-        {
-          fp: 'Q3',
-          fy: year - 1,
-        },
-        {
-          fp: 'Q2',
-          fy: year - 1,
-        },
-      ]
-    case 'Q2':
-      return [
-        {
-          fp: 'Q1',
-          fy: year,
-        },
-        {
-          fp: 'Q4',
-          fy: year - 1,
-        },
-        {
-          fp: 'Q3',
-          fy: year - 1,
-        },
-      ]
-    case 'Q3':
-      return [
-        {
-          fp: 'Q2',
-          fy: year,
-        },
-        {
-          fp: 'Q1',
-          fy: year,
-        },
-        {
-          fp: 'Q4',
-          fy: year - 1,
-        },
-      ]
-    case 'Q4':
-      return [
-        {
-          fp: 'Q3',
-          fy: year,
-        },
-        {
-          fp: 'Q2',
-          fy: year,
-        },
-        {
-          fp: 'Q1',
-          fy: year,
-        },
-      ]
-    default:
-      break
-  }
-}
-
-export const setQuarterFromFrame = (report: ReportPretty) => {
-  const frame = report.frame?.replace('CY', '')
-  const splitFrame = frame!.split('Q')
-  const fp = splitFrame?.length === 2 ? `Q${splitFrame[1]}` : 'FY'
-  const fy = Number(splitFrame[0])
-  return {
-    ...report,
-    fp,
-    fy,
-  } as ReportPretty
-}
-
 export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
   if (reports.some((x) => !x.start)) {
-    return reports
+    return reports.map((x) => ({
+      ...x,
+      ttm: x.val,
+    }))
   }
-  const reportsByPeriod = Object.values(
-    groupBy(reports, (report) => report.fp)
-  ).flat()
-  if (reportsByPeriod.length === 4) {
-    const fullYearReport = reportsByPeriod.find((x) => x.endMonths === 12)
-    if (fullYearReport) {
-      const quarterlyReports = reportsByPeriod.filter(
-        (report) => report.endMonths === 3
+
+  const quarterlyReports = reports
+    .map((report) => {
+      if (report.endMonths === 3) return report
+      const preQuarterlyReports = reports.filter(
+        (x) => x.endMonths === 3 && getMonthsBetween(report.end, x.end)! <= 12
       )
-      if (quarterlyReports.length === 3) {
-        const nineMonthRevenue = quarterlyReports.reduce(
+      if (preQuarterlyReports.length === 3) {
+        const nineMonthRevenue = preQuarterlyReports.reduce(
           (acc, curr) => (acc += curr.val!),
           0
         )
-        return [
-          ...quarterlyReports,
-          {
-            ...fullYearReport,
-            start: quarterlyReports[2].end,
-            fp: 'Q4',
-            val: fullYearReport.val! - nineMonthRevenue,
-            endMonths: 3,
-          } as ReportPretty,
-        ]
-      }
-    }
-  }
-  if (reportsByPeriod.every((report) => report.start === reports[0].start)) {
-    return sortReports(reportsByPeriod, 'endMonths').reduce((data, curr) => {
-      if (data.length === 0) {
-        data.push(curr)
-      } else {
-        const prev = data[data.length - 1]
-        data.push({
-          ...curr,
-          start: prev.end,
-          val: curr.val! - prev.val!,
+        return {
+          ...report,
+          start: preQuarterlyReports[2].end,
+          val: report.val! - nineMonthRevenue,
           endMonths: 3,
-        })
+        } as ReportPretty
       }
-      return data
-    }, [] as ReportPretty[])
-  }
-  return reports
-}
-
-export const checkAndAddMissingQuarter = (reports: ReportPretty[]) => {
-  const reportsWithMissingQuarter = reports.reduce(
-    (values, currReport) => {
-      if (currReport.fp === 'FY') {
-        const endDateSplit = currReport.end.split('-')
-        const month = Number(endDateSplit[1])
-        const missingQuarter = getQuarterFromMonth(month)
-        const existingReport = reports.find(
-          (x) => x.fy === currReport.fy && x.fp === missingQuarter
-        )
-        if (!existingReport) {
-          const matchingQuarters = getFiscalYearQs(
-            currReport.fy,
-            missingQuarter
-          )
-
-          const allQuarterReportsForFiscalYear = reports.filter(
-            (x) =>
-              !!matchingQuarters?.find(
-                (match) => x.fp === match.fp && x.fy === match.fy
-              )
-          )
-          if (allQuarterReportsForFiscalYear.length === 3) {
-            const firstThreeQuarterRevs = allQuarterReportsForFiscalYear.reduce(
-              (totalRevs, rep) => {
-                totalRevs += rep.val ?? 0
-                return totalRevs
-              },
-              0
-            )
-            values.result.push({
-              ...currReport,
-              start: allQuarterReportsForFiscalYear[2].end,
-              val: currReport.val
-                ? currReport.val - firstThreeQuarterRevs
-                : undefined,
-              fp: missingQuarter,
-            })
-          }
-        }
-      } else {
-        values.result.push({
-          ...currReport,
-        })
+      const trailingMonthEnd = reports.find(
+        (x) =>
+          x.endMonths === report.endMonths! - 3 &&
+          getMonthsBetween(report.end, x.end)! <= 3
+      )
+      if (trailingMonthEnd) {
+        return {
+          ...report,
+          start: trailingMonthEnd.end,
+          val: report.val! - trailingMonthEnd.val!,
+          endMonths: 3,
+        } as ReportPretty
       }
-      return values
-    },
-    { result: [] as ReportPretty[] }
-  )
-  return reportsWithMissingQuarter.result
+    })
+    .filter((x) => x !== undefined) as ReportPretty[]
+
+  return quarterlyReports.map((report) => {
+    const ttm = quarterlyReports.filter((x) => {
+      const monthsBetween = getMonthsBetween(report.end, x.end)
+      return monthsBetween && monthsBetween < 11 && monthsBetween > 1
+    })
+    let prevVals
+    if (ttm.length === 3) {
+      prevVals = ttm.reduce((acc, report) => (acc += report.val!), 0)
+    }
+    return {
+      ...report,
+      ttm: prevVals ? report.val! + prevVals : undefined,
+    } as ReportPretty
+  })
 }

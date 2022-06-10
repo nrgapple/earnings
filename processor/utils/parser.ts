@@ -313,7 +313,6 @@ export const load = (earning: EarningsMetric) => {
 
   // Revenues
   tags['Revenues'] = [
-    ...(earning.metrics['Revenues'] ?? []),
     ...(earning.metrics['SalesRevenueNet'] ?? []),
     ...(earning.metrics['SalesRevenueGoodsNet'] ?? []),
     ...(earning.metrics['SalesRevenueServicesNet'] ?? []),
@@ -329,6 +328,7 @@ export const load = (earning: EarningsMetric) => {
     ...(earning.metrics[
       'RevenueFromContractWithCustomerExcludingAssessedTax'
     ] ?? []),
+    ...(earning.metrics['Revenues'] ?? []),
   ]
 
   // CostOfRevenue
@@ -840,6 +840,9 @@ export const load = (earning: EarningsMetric) => {
     ...(earning.metrics['CashAndCashEquivalentsPeriodIncreaseDecrease'] ?? []),
     ...(earning.metrics['CashPeriodIncreaseDecrease'] ?? []),
     ...(earning.metrics['NetCashProvidedByUsedInContinuingOperations'] ?? []),
+    ...(earning.metrics[
+      'CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect'
+    ] ?? []),
   ]
 
   // NetCashFlowsOperating

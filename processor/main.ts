@@ -1,11 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { config } from './config'
 import { getAllCompanyData } from './stocks'
-import {
-  hasCache,
-  getCachedEarnings,
-  setCachedEarnings,
-} from './data/dataCache'
+import { hasCache, getCachedEarnings } from './data/dataCache'
 import { cleanEarningsData } from './utils/process'
 import { Earnings, EarningsMetric, ReportResp, TickerInfo } from './types'
 import { getChunks, getDomesticCompanies } from './utils'
@@ -22,9 +18,10 @@ const getCompaniesByChunk = async (
       companies.map(async (company) => {
         const fullCik = `CIK${`${company.cik_str}`.padStart(10, '0')}`
         const filings = await getCompanyFilings(fullCik)
+
         const allForms = filings?.filings.recent.form
           .map((x, i) => (x === '10-Q' || x === '10-K' ? i : undefined))
-          .filter((x) => x) as number[]
+          .filter((x) => x !== undefined) as number[]
         const accnToAdd = allForms?.map((idx) => {
           const accn = filings?.filings.recent.accessionNumber[idx]
           const document = filings?.filings.recent.primaryDocument[idx]
@@ -65,7 +62,6 @@ const getCompaniesByChunk = async (
 
 const uploadToPrisma = async (company: EarningsMetric) => {
   console.log('adding: ', company.ticker)
-
   await prisma.report.createMany({
     skipDuplicates: true,
     data: Object.entries(company.metrics).flatMap(([tag, reports]) => {
@@ -100,12 +96,9 @@ export const getEarnings = async (companies: TickerInfo[], useZip: boolean) => {
       })),
     })
     const earnings = await getCompaniesByChunk(companyChunk, useZip)
-    earnings.forEach((x) => {
-      console.log(x.ticker)
-    })
     const domesticEarnings = getDomesticCompanies(earnings)
+
     const companiesCleaned = cleanEarningsData(domesticEarnings)
-    // await prisma.report.deleteMany({})
     console.log(`loading chunk: ${i}, length: ${companiesCleaned.length}`)
     for await (const cleaned of companiesCleaned) {
       await uploadToPrisma(cleaned)
@@ -113,9 +106,7 @@ export const getEarnings = async (companies: TickerInfo[], useZip: boolean) => {
   }
 }
 
-const main2 = async () => {
+const main = async () => {
   const companies = await getAllCompanyData()
   const earnings = await getEarnings(companies, true)
 }
-
-// main2()

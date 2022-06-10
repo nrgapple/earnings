@@ -74,7 +74,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
 
     const companies = await getAllCompanyData(ciks)
     await getEarnings(
-      companies.filter((x) => x.ticker === 'DELL'),
+      companies.filter((x) => x.ticker === 'FL'),
       false
     )
 

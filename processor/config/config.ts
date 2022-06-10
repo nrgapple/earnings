@@ -4,7 +4,7 @@ const callback = (first: ReportPretty, second: ReportPretty) => {
   return {
     start: first.start,
     end: first.end,
-    val: first.val! / second.val!,
+    val: first.ttm! / second.ttm!,
     fp: first.fp,
     fy: first.fy,
   } as ReportPretty
