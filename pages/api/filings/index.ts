@@ -35,7 +35,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     )
 
     const idxFilings = (await fullIndexFilings.json()) as FullIndexYear
-
+    await timeout(500)
     const mostUTDFiling = idxFilings.directory.item
       .filter((x) => /^company.\d+.idx/g.test(x.name))
       .pop()
@@ -51,6 +51,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     //   return res.status(201)
     // }
 
+    await timeout(500)
     const presentFilings = await fetch(
       `https://www.sec.gov/Archives/edgar/daily-index/${new Date().getFullYear()}/${
         currentQuarter.name
@@ -70,11 +71,9 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
 
     const ciks = splitRows.map((x) => `${x[2]}`.padStart(10, '0'))
 
-    await timeout(1000)
-
     const companies = await getAllCompanyData(ciks)
     await getEarnings(
-      companies.filter((x) => x.ticker === 'FL'),
+      companies.filter((x) => true),
       false
     )
 

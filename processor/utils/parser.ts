@@ -328,6 +328,9 @@ export const load = (earning: EarningsMetric) => {
     ...(earning.metrics[
       'RevenueFromContractWithCustomerExcludingAssessedTax'
     ] ?? []),
+    ...(earning.metrics[
+      'RevenueFromContractWithCustomerIncludingAssessedTax'
+    ] ?? []),
     ...(earning.metrics['Revenues'] ?? []),
   ]
 

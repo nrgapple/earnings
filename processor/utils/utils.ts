@@ -138,37 +138,42 @@ export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
   }
 
   const quarterlyReports = reports
-    .map((report) => {
-      if (report.endMonths === 3) return report
-      const preQuarterlyReports = reports.filter(
-        (x) => x.endMonths === 3 && getMonthsBetween(report.end, x.end)! <= 12
+    .reduce((quarterlyReports, currentReport) => {
+      if (currentReport.endMonths === 3) {
+        quarterlyReports.push(currentReport)
+        return quarterlyReports
+      }
+      const preQuarterlyReports = quarterlyReports.filter(
+        (x) =>
+          x.endMonths === 3 && getMonthsBetween(currentReport.end, x.end)! < 11
       )
       if (preQuarterlyReports.length === 3) {
         const nineMonthRevenue = preQuarterlyReports.reduce(
           (acc, curr) => (acc += curr.val!),
           0
         )
-        return {
-          ...report,
+        quarterlyReports.push({
+          ...currentReport,
           start: preQuarterlyReports[2].end,
-          val: report.val! - nineMonthRevenue,
+          val: currentReport.val! - nineMonthRevenue,
           endMonths: 3,
-        } as ReportPretty
+        } as ReportPretty)
       }
-      const trailingMonthEnd = reports.find(
+      const trailingMonthEnd = quarterlyReports.find(
         (x) =>
-          x.endMonths === report.endMonths! - 3 &&
-          getMonthsBetween(report.end, x.end)! <= 3
+          x.endMonths === currentReport.endMonths! - 3 &&
+          getMonthsBetween(currentReport.end, x.end)! <= 3
       )
       if (trailingMonthEnd) {
-        return {
-          ...report,
+        quarterlyReports.push({
+          ...currentReport,
           start: trailingMonthEnd.end,
-          val: report.val! - trailingMonthEnd.val!,
+          val: currentReport.val! - trailingMonthEnd.val!,
           endMonths: 3,
-        } as ReportPretty
+        } as ReportPretty)
       }
-    })
+      return quarterlyReports
+    }, [] as ReportPretty[])
     .filter((x) => x !== undefined) as ReportPretty[]
 
   return quarterlyReports.map((report) => {
@@ -177,6 +182,7 @@ export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
       return monthsBetween && monthsBetween < 11 && monthsBetween > 1
     })
     let prevVals
+
     if (ttm.length === 3) {
       prevVals = ttm.reduce((acc, report) => (acc += report.val!), 0)
     }

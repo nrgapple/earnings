@@ -10,16 +10,16 @@ import {
 } from './utils'
 
 const cleanCompanyEarnings = (earning: Earnings) => {
-  const earningMapArr = Object.entries(earning.tags)
-    .map(
+  const earningMap = objArrToObj<string, ReportPretty[]>(
+    Object.entries(earning.tags).map(
       ([tag, tagData]) =>
         ({
           key: tag,
           value: tagData.units.USD,
         } as EarningMap)
     )
-    .filter((x) => x.value)
-  const earningMap = objArrToObj<string, ReportPretty[]>(earningMapArr)
+  )
+
   const parsedMetrics = load({ ticker: earning.ticker, metrics: earningMap })
   const cleanedEarnings = {
     ...parsedMetrics,
