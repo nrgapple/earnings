@@ -27,18 +27,14 @@ model Company {
 model Report {
   id            String    @id @default(uuid())
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime?
   val           Float?
-  accn          String?
   end           DateTime
   start         DateTime?
-  fp            String
-  fy            Int
   tag           String
   secLink       String?
   Company       Company?  @relation(fields: [companyTicker], references: [ticker])
   companyTicker String?
 
-  @@unique([start, end, tag, companyTicker])
+  @@unique([end, tag, companyTicker])
   @@index([tag])
 }

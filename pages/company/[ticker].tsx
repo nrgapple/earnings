@@ -23,7 +23,7 @@ const CompanyPage = () => {
             <Link
               target={'_blank'}
               href={`https://www.sec.gov/ix?doc=/Archives/edgar/data/${x.secLink}`}
-            >{`${x.fp}-${x.fy}`}</Link>
+            >{`${x.end}`}</Link>
           </Grid>
         )
       })

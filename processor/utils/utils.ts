@@ -1,6 +1,5 @@
 import moment from 'moment'
-import { config } from '../config'
-import { Defined, Earnings, ReportPretty, TagData, TagsKey } from '../types'
+import { Defined, Earnings, ReportPretty, TagData } from '../types'
 
 export const errorsCache = [] as unknown[]
 

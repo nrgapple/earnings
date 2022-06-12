@@ -40,9 +40,10 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
       .map((x) => x.split(/  +/))
       .filter((row) => row[1] === '10-Q' || row[1] === '10-K')
 
-    const ciks = splitRows.map((x) => `${x[2]}`.padStart(10, '0'))
-
+    const ciks = splitRows.map((x) => `${x[2]}`)
     const companies = await getCompanyTickers(ciks)
+    console.log(companies)
+
     await getEarnings(companies, false)
 
     await prisma.latestFiling.upsert({

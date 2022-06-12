@@ -55,22 +55,7 @@ export const priceFormatter = (v) => {
 
 export const calcYoYGrowth = (reports: Report[]) => {
   if (reports) {
-    const allData = reports.reduce(
-      (data, currentReport) => {
-        const lastYearReport = reports.find(
-          (x) => x.fp === currentReport.fp && x.fy === currentReport.fy - 1
-        )
-        if (!lastYearReport) return data
-        const percentYoY = calcPercentGrowth(lastYearReport, currentReport)
-        return {
-          totalPercent: (data.totalPercent += percentYoY),
-          quarters: (data.quarters += 1),
-          [currentReport.end]: toPercentFormat(percentYoY),
-        }
-      },
-      { totalPercent: 0, quarters: 0 }
-    )
-    return toPercentFormat(allData.totalPercent / allData.quarters)
+    return 100
   }
   return null
 }

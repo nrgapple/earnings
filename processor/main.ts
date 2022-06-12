@@ -66,15 +66,12 @@ const uploadToPrisma = async (company: EarningsMetric) => {
     skipDuplicates: true,
     data: Object.entries(company.metrics).flatMap(([tag, reports]) => {
       return reports.map((report) => {
-        const { fp, fy, val, end, start, accn, link } = report
+        const { val, end, start, link } = report
         return {
-          fp,
-          fy,
           end: new Date(end),
-          start: start ? new Date(start) : undefined,
+          start: start ? new Date(start) : null,
           val,
           tag,
-          accn,
           companyTicker: company.ticker,
           secLink: link,
         } as Prisma.ReportCreateManyInput

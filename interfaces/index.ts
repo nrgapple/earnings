@@ -26,15 +26,9 @@ export interface DBCompany {
 export interface Report {
   id: string
   val?: number
-  form?: string
-  fy: number
-  fp: string
   start: string
   end: string
-  filed?: string
-  frame?: string
   tag: string
-  accn?: string
   secLink?: string
 }
 
