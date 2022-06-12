@@ -11,3 +11,7 @@ export const CompanyMetrics = {
     },
   ],
 }
+
+export const currentYear = new Date().getFullYear()
+
+export const userAgent = `tross capital trosscaptial@gmail.com`

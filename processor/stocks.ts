@@ -1,7 +1,6 @@
 import { Earnings, TickerInfo } from './types'
 import { errorsCache, getChunks, mapTrim, timeout } from './utils/utils'
 import { config } from './config/config'
-import cliProgress from 'cli-progress'
 import {
   getCompanyReport,
   getEarningsCalendar,
@@ -37,8 +36,8 @@ const getCompaniesEarningsByChunks = async (
   return reports
 }
 
-export const getAllCompanyData = async (filteredCiks?: string[]) => {
-  const allCompanies = Object.values(await getCompanyTickers()).map(
+export const getAllCompanyData = async () => {
+  return Object.values(await getCompanyTickers()).map(
     (data) =>
       ({
         ticker: data.ticker,
@@ -46,10 +45,6 @@ export const getAllCompanyData = async (filteredCiks?: string[]) => {
         cik_str: `${data.cik_str}`.padStart(10, '0'),
       } as TickerInfo)
   )
-
-  return filteredCiks
-    ? allCompanies.filter((x) => filteredCiks.includes(x.cik_str as string))
-    : allCompanies
 }
 
 /**
@@ -60,7 +55,6 @@ export const getAllCompanyData = async (filteredCiks?: string[]) => {
  */
 
 export const getAllEarningReportsByDate = async (date: string) => {
-  const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
   try {
     const earnings = await getEarningsCalendar(date)
     const allTickers = Object.values(await getCompanyTickers())
@@ -76,18 +70,13 @@ export const getAllEarningReportsByDate = async (date: string) => {
       tickersToUse,
       config.earningsChunkSize
     ) as TickerInfo[][]
-    bar1.start(earningsChunks.length, 0)
     const earningReports = await getCompaniesEarningsByChunks(
       earningsChunks,
       config.waitTime,
-      (i) => {
-        bar1.update(i)
-      }
+      (i) => {}
     )
     return earningReports
   } catch (e) {
     errorsCache.push(e)
-  } finally {
-    bar1.stop()
   }
 }

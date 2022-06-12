@@ -15,19 +15,6 @@ const calcOperation = (num: number, num2: number, operation: OperationType) => {
   }
 }
 
-const calcNumberToTag = (
-  num: number,
-  tag: ReportPretty[],
-  operation: OperationType
-) => {
-  return tag.map((report) => {
-    return {
-      ...report,
-      val: report.val ? calcOperation(num, report.val, operation) : undefined,
-    } as ReportPretty
-  })
-}
-
 const getCalculateTag = (
   tag1: ReportPretty[] | undefined,
   tag2: ReportPretty[] | undefined,

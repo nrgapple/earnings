@@ -1,5 +1,12 @@
 import { Report } from '../interfaces'
 
+export const timeout = (time: number) =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(null)
+    }, time)
+  })
+
 export const groupBy = <T>(arr: T[], func: (v: T) => string | undefined) => {
   return arr.reduce((prev, curr) => {
     const key = func(curr)
@@ -73,4 +80,10 @@ export const calcPercentGrowth = (prev: Report, curr: Report) => {
     return 0
   }
   return ((curr.val - prev.val) / Math.abs(prev.val)) * 100
+}
+
+export const sortReports = (reports: Report[], field1: keyof Report) => {
+  return reports.sort(
+    (a, b) => new Date(a[field1]!).getTime() - new Date(b[field1]!).getTime()
+  )
 }
