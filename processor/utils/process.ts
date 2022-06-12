@@ -13,13 +13,15 @@ export const calculateYtdToQuarter = (reports: ReportPretty[]) => {
 
   const quarterlyReports = reports
     .reduce((quarterlyReports, currentReport) => {
-      if (currentReport.endMonths === 3) {
+      if (currentReport.endMonths && currentReport.endMonths <= 4) {
         quarterlyReports.push(currentReport)
         return quarterlyReports
       }
       const preQuarterlyReports = quarterlyReports.filter(
         (x) =>
-          x.endMonths === 3 && getMonthsBetween(currentReport.end, x.end)! < 11
+          x.endMonths &&
+          x.endMonths <= 4 &&
+          getMonthsBetween(currentReport.end, x.end)! < 11
       )
       if (preQuarterlyReports.length === 3) {
         const nineMonthRevenue = preQuarterlyReports.reduce(

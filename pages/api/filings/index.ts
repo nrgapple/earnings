@@ -42,8 +42,6 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
 
     const ciks = splitRows.map((x) => `${x[2]}`)
     const companies = await getCompanyTickers(ciks)
-    console.log(companies)
-
     await getEarnings(companies, false)
 
     await prisma.latestFiling.upsert({
