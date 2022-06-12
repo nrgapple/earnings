@@ -73,24 +73,6 @@ export const calcPercentGrowth = (prev: ReportPretty, curr: ReportPretty) => {
   return ((curr.val - prev.val) / Math.abs(prev.val)) * 100
 }
 
-/**
- * Filters out all of the tags that are not included in the configuration
- * file.
- *
- * @param companyTagsMap
- * @returns only configured tags
- */
-export const getConfiguredTags = <T extends unknown>(
-  companyTagsMap: Record<TagsKey, T>
-) => {
-  const configuredTags = {} as Record<TagsKey, T>
-  Object.keys(config.weights).forEach((key) => {
-    if (companyTagsMap[key as TagsKey])
-      configuredTags[key as TagsKey] = companyTagsMap[key as TagsKey]
-  })
-  return configuredTags
-}
-
 export const getDomesticCompanies = (earning: Earnings[]) => {
   return earning.filter((earnings) => {
     return earnings.tags
