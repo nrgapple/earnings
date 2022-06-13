@@ -67,7 +67,7 @@ export const GraphCard = ({
             }))}
           />
         )}
-        <MicroGraph tags={filteredTags(company)} />
+        <TagGraph tags={filteredTags(company)} />
       </Card.Body>
     </Card>
   )
