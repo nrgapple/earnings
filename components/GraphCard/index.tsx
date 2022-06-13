@@ -1,9 +1,11 @@
-import { Card, Divider, Grid, Text } from '@nextui-org/react'
+import { Card, Divider, Grid, Table, Text } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
 import Select, { MultiValue } from 'react-select'
 import { CompanyMetrics } from '../../constants'
 import { Company } from '../../interfaces'
 import { calcYoYGrowth, objArrToObj } from '../../utils'
+import { MicroGraph } from '../MicroGraph'
+import { QuickMetrics } from '../QuickMetrics'
 import { TagGraph } from '../TagGraph'
 
 interface GraphCardProps {
@@ -53,26 +55,7 @@ export const GraphCard = ({
       </Card.Header>
       <Divider />
       <Card.Body css={{ height }}>
-        <Grid.Container>
-          {Object.entries(CompanyMetrics).map(([row, data]) =>
-            data.map((x) => (
-              <>
-                <Grid alignItems="center" xs={3}>
-                  <Text size={'12px'} weight={'bold'}>
-                    {x.name}:
-                  </Text>
-                </Grid>
-                <Grid xs={9}>
-                  <Text css={{ pl: '$3' }}>
-                    {calcYoYGrowth(
-                      company.tags[x.tag.find((x) => company.tags[x])]
-                    )}
-                  </Text>
-                </Grid>
-              </>
-            ))
-          )}
-        </Grid.Container>
+        {/* <QuickMetrics company={company} /> */}
         {showFilters && (
           <Select
             defaultValue={selectedTags}
@@ -84,7 +67,7 @@ export const GraphCard = ({
             }))}
           />
         )}
-        <TagGraph tags={filteredTags(company)} />
+        <MicroGraph tags={filteredTags(company)} />
       </Card.Body>
     </Card>
   )
