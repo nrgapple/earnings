@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Report } from '../interfaces'
 
 export const timeout = (time: number) =>
@@ -71,4 +72,8 @@ export const sortReports = (reports: Report[], field1: keyof Report) => {
   return reports.sort(
     (a, b) => new Date(a[field1]!).getTime() - new Date(b[field1]!).getTime()
   )
+}
+
+export const formatDate = (strDate: string) => {
+  return moment(strDate).format('YYYY-MMM-DD')
 }

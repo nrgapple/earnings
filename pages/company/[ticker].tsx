@@ -1,12 +1,13 @@
-import { Grid, Link, Text } from '@nextui-org/react'
+import { Col, Container, Grid, Link, Row, Text } from '@nextui-org/react'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '..'
 import { GraphCard } from '../../components/GraphCard'
 import Layout from '../../components/Layout'
-import { CompaniesResp } from '../../interfaces'
-import { groupBy } from '../../utils'
+import { CompaniesResp, Report } from '../../interfaces'
+import { formatDate, groupBy } from '../../utils'
 
 const CompanyPage = () => {
   const router = useRouter()
@@ -17,13 +18,35 @@ const CompanyPage = () => {
   const secReportLinks = useMemo(() => {
     if (data?.companies.length > 0) {
       const company = data.companies[0]
-      return company.tags['Assets'].map((x) => {
+      return Object.entries(
+        company.tags['Assets'].reduce((reportsByYear, currentReport) => {
+          const formattedDate = formatDate(currentReport.end)
+          const newReport = {
+            ...currentReport,
+            end: formattedDate,
+          }
+          const year = formattedDate.split('-')[0]
+          if (reportsByYear[year]) {
+            reportsByYear[year].push(newReport)
+          } else {
+            reportsByYear[year] = [newReport]
+          }
+          return reportsByYear
+        }, {} as { [key: string]: Report[] })
+      ).map(([year, reports]: [string, Report[]]) => {
         return (
-          <Grid justify="center" xs={2}>
-            <Link
-              target={'_blank'}
-              href={`https://www.sec.gov/ix?doc=/Archives/edgar/data/${x.secLink}`}
-            >{`${x.end}`}</Link>
+          <Grid xs={3}>
+            <Col>
+              <Row>{year}</Row>
+              {reports.map((report) => (
+                <Row>
+                  <Link
+                    target={'_blank'}
+                    href={`https://www.sec.gov/ix?doc=/Archives/edgar/data/${report.secLink}`}
+                  >{`${formatDate(report.end)}`}</Link>
+                </Row>
+              ))}
+            </Col>
           </Grid>
         )
       })
@@ -50,7 +73,7 @@ const CompanyPage = () => {
       <Text css={{ pl: '$18' }} h4>
         SEC Filings
       </Text>
-      <Grid.Container css={{ p: '$11' }}>{secReportLinks}</Grid.Container>
+      <Grid.Container gap={1}>{secReportLinks}</Grid.Container>
     </Layout>
   )
 }
